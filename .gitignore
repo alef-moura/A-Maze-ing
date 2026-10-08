@@ -1,0 +1,20 @@
+# Python artifacts
+__pycache__/
+*.py[cod]
+.mypy_cache/
+.pytest_cache/
+.venv/
+venv/
+
+# Build artifacts (the final mazegen-* files at the root ARE versioned)
+build/
+dist/
+*.egg-info/
+
+# Generated maze output
+maze.txt
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/

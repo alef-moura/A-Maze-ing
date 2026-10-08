@@ -1,0 +1,11 @@
+# A-Maze-ing default configuration (one KEY=VALUE per line)
+WIDTH=20
+HEIGHT=15
+ENTRY=0,0
+EXIT=19,14
+OUTPUT_FILE=maze.txt
+PERFECT=False
+
+# Optional keys
+# SEED=42
+# ALGORITHM=dfs   (dfs, prim or kruskal)

@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mazegen"
+version = "1.0.0"
+description = "Reusable maze generator: perfect or loop-rich mazes, BFS solver, '42' pattern."
+readme = "mazegen/README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE.md"]
+authors = [{ name = "A-Maze-ing team" }]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Typing :: Typed",
+]
+
+[tool.setuptools]
+packages = ["mazegen"]
+
+[tool.setuptools.package-data]
+mazegen = ["py.typed", "README.md"]

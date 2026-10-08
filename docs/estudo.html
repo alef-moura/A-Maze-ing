@@ -1,0 +1,2326 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Guia de estudo A-Maze-ing</title>
+<style>
+:root {
+  --bg: #f7f8fa; --surface: #ffffff; --surface-2: #eef1f5;
+  --text: #1c2430; --muted: #5a6677; --border: #d6dce5;
+  --accent: #2563eb; --accent-soft: #e3ecff;
+  --warn: #b45309; --warn-soft: #fff3df;
+  --ok: #15803d; --ok-soft: #e3f6ea;
+  --code-bg: #f1f4f9; --code-text: #1c2430;
+  --tk-c: #6b7a90; --tk-s: #b0410f; --tk-k: #7a3fd1; --tk-n: #0b7a75;
+  --c-bg: #ffffff; --c-wall: #243247; --c-text: #1c2430;
+  --c-visited: #cfe0ff; --c-unvisited: #e4e8ee; --c-stack: #ffd479;
+  --c-cur: #ff7a59; --c-path: #5ad19a; --c-queue: #ffd479;
+  --c-dead: #ff8b8b; --c-start: #2563eb; --c-goal: #c2410c;
+  --radius: 10px;
+}
+:root[data-theme="dark"] {
+  --bg: #0f141b; --surface: #171e28; --surface-2: #1f2835;
+  --text: #e6ebf2; --muted: #9aa7ba; --border: #2d394a;
+  --accent: #7aa7ff; --accent-soft: #1b2a47;
+  --warn: #f5b062; --warn-soft: #33260f;
+  --ok: #6fd69a; --ok-soft: #12301f;
+  --code-bg: #0c1118; --code-text: #e6ebf2;
+  --tk-c: #7d8ca3; --tk-s: #f0a070; --tk-k: #c39bff; --tk-n: #5fd6cf;
+  --c-bg: #11171f; --c-wall: #d5deea; --c-text: #e6ebf2;
+  --c-visited: #26406e; --c-unvisited: #1b232e; --c-stack: #8a6a1e;
+  --c-cur: #ff7a59; --c-path: #2f9d6a; --c-queue: #8a6a1e;
+  --c-dead: #b44; --c-start: #5b8def; --c-goal: #e2703a;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f141b; --surface: #171e28; --surface-2: #1f2835;
+    --text: #e6ebf2; --muted: #9aa7ba; --border: #2d394a;
+    --accent: #7aa7ff; --accent-soft: #1b2a47;
+    --warn: #f5b062; --warn-soft: #33260f;
+    --ok: #6fd69a; --ok-soft: #12301f;
+    --code-bg: #0c1118; --code-text: #e6ebf2;
+    --tk-c: #7d8ca3; --tk-s: #f0a070; --tk-k: #c39bff; --tk-n: #5fd6cf;
+    --c-bg: #11171f; --c-wall: #d5deea; --c-text: #e6ebf2;
+    --c-visited: #26406e; --c-unvisited: #1b232e; --c-stack: #8a6a1e;
+    --c-cur: #ff7a59; --c-path: #2f9d6a; --c-queue: #8a6a1e;
+    --c-dead: #b44; --c-start: #5b8def; --c-goal: #e2703a;
+  }
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 70px; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font: 16px/1.65 -apple-system, "Segoe UI", Roboto, Helvetica, Arial,
+    sans-serif;
+}
+code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas,
+  monospace; }
+:not(pre) > code {
+  background: var(--code-bg); padding: 1px 6px; border-radius: 5px;
+  font-size: 0.9em; border: 1px solid var(--border);
+}
+a { color: var(--accent); }
+header.top {
+  position: sticky; top: 0; z-index: 20; display: flex; gap: 12px;
+  align-items: center; padding: 10px 16px; background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+header.top h1 { font-size: 1.05rem; margin: 0; flex: 1; }
+.btn {
+  font: inherit; font-size: 0.9rem; cursor: pointer; padding: 6px 12px;
+  border-radius: 8px; border: 1px solid var(--border);
+  background: var(--surface); color: var(--text);
+}
+.btn:hover { border-color: var(--accent); }
+.btn.toggle.on { background: var(--accent); color: #fff;
+  border-color: var(--accent); }
+#menu-btn { display: none; }
+.layout { display: grid; grid-template-columns: 300px minmax(0, 1fr);
+  max-width: 1280px; margin: 0 auto; }
+aside#side {
+  position: sticky; top: 57px; align-self: start;
+  max-height: calc(100vh - 57px); overflow-y: auto; padding: 16px;
+  border-right: 1px solid var(--border);
+}
+#search { width: 100%; font: inherit; padding: 8px 10px; margin-bottom: 10px;
+  border-radius: 8px; border: 1px solid var(--border);
+  background: var(--surface); color: var(--text); }
+.progress { margin: 4px 0 14px; font-size: 0.85rem; color: var(--muted); }
+.progress .bar { height: 6px; background: var(--surface-2);
+  border-radius: 3px; margin-top: 4px; overflow: hidden; }
+.progress .bar div { height: 100%; width: 0; background: var(--ok); }
+aside nav details { margin-bottom: 4px; }
+aside nav summary { cursor: pointer; padding: 5px 0; font-weight: 600;
+  display: flex; gap: 8px; align-items: center; }
+aside nav summary a { color: var(--text); text-decoration: none; flex: 1; }
+aside nav ul { list-style: none; margin: 0 0 8px 24px; padding: 0; }
+aside nav li a { display: block; padding: 2px 0; font-size: 0.88rem;
+  color: var(--muted); text-decoration: none; }
+aside nav li a:hover { color: var(--accent); }
+main { padding: 24px 32px 80px; min-width: 0; }
+main h2 { font-size: 1.6rem; margin: 48px 0 6px; padding-bottom: 6px;
+  border-bottom: 2px solid var(--accent); }
+main h2 .mod-num { color: var(--accent); }
+.module-intro { color: var(--muted); margin-top: 0; }
+.concept { background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 18px 20px; margin: 18px 0; }
+.concept[hidden], section.module[hidden] { display: none; }
+.concept h3 { margin: 0 0 8px; font-size: 1.2rem; }
+.concept h3 .num { color: var(--accent); margin-right: 6px; }
+.one { margin: 6px 0; }
+.tag { display: inline-block; font-size: 0.72rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.04em; padding: 1px 8px;
+  border-radius: 999px; background: var(--accent-soft); color: var(--accent);
+  margin-right: 6px; }
+.tag.warn { background: var(--warn-soft); color: var(--warn); }
+.tag.ok { background: var(--ok-soft); color: var(--ok); }
+.analogy, .where, .mistake { margin: 8px 0; }
+pre { margin: 10px 0; padding: 12px 14px; overflow-x: auto; font-size: 0.88rem;
+  line-height: 1.5; background: var(--code-bg); color: var(--code-text);
+  border: 1px solid var(--border); border-radius: 8px; }
+.out pre { border-left: 4px solid var(--ok); margin-top: 0; }
+.out .lbl { font-size: 0.75rem; font-weight: 700; color: var(--ok);
+  text-transform: uppercase; letter-spacing: 0.04em; margin: 8px 0 2px; }
+.tk-c { color: var(--tk-c); font-style: italic; } .tk-s { color: var(--tk-s); }
+.tk-k { color: var(--tk-k); font-weight: 600; } .tk-n { color: var(--tk-n); }
+details.quiz { margin-top: 10px; border: 1px dashed var(--border);
+  border-radius: 8px; padding: 8px 12px; }
+details.quiz summary { cursor: pointer; font-weight: 600; }
+details.quiz p { margin: 8px 0 0; color: var(--ok); }
+.widget { display: flex; flex-wrap: wrap; gap: 18px; margin: 12px 0;
+  padding: 14px; background: var(--surface-2); border-radius: 8px; }
+.widget.column { flex-direction: column; }
+.widget-side { flex: 1 1 260px; min-width: 240px; }
+.maze-canvas { max-width: 100%; height: auto; border: 1px solid var(--border);
+  border-radius: 6px; background: var(--c-bg); }
+.cell-canvas { border: 1px solid var(--border); border-radius: 6px;
+  background: var(--c-bg); }
+.decoder-left { flex: 0 0 auto; }
+.decoder-right { flex: 1 1 260px; }
+.btn-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+  margin: 8px 0; }
+.num-input { font: inherit; width: 90px; padding: 5px 8px; border-radius: 6px;
+  border: 1px solid var(--border); background: var(--surface);
+  color: var(--text); }
+.hex-input { width: 46px; text-align: center; text-transform: uppercase; }
+.step-msg { min-height: 3.4em; margin: 8px 0; }
+.stack-box { font-family: ui-monospace, Menlo, monospace; font-size: 0.85rem;
+  word-break: break-word; }
+.counter { font-size: 0.8rem; font-weight: 700; color: var(--accent); }
+.hint { color: var(--muted); font-size: 0.88rem; margin: 6px 0; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 8px;
+  font-size: 0.82rem; color: var(--muted); }
+.legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px;
+  vertical-align: -1px; border: 1px solid var(--border); }
+.decoder-info p { margin: 4px 0; }
+code.big { font-size: 1.4rem; }
+.seed-grid { display: flex; flex-wrap: wrap; gap: 14px; }
+.fig { margin: 0; } .fig figcaption { text-align: center; font-size: 0.85rem;
+  color: var(--muted); }
+.hexbox { display: inline-block; letter-spacing: 0.3em; }
+.flow { display: flex; flex-wrap: wrap; gap: 8px; align-items: stretch;
+  margin: 14px 0; }
+.flow .box { flex: 1 1 130px; background: var(--surface);
+  border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px;
+  font-size: 0.85rem; }
+.flow .box b { display: block; color: var(--accent); }
+.flow .arrow { align-self: center; color: var(--muted); font-size: 1.2rem; }
+table.files { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+table.files th, table.files td { text-align: left; padding: 6px 8px;
+  border-bottom: 1px solid var(--border); vertical-align: top; }
+.gloss { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px,
+  1fr)); gap: 8px 20px; }
+.gloss div { padding: 6px 0; border-bottom: 1px solid var(--border); }
+.gloss dt { font-weight: 700; } .gloss dd { margin: 0; color: var(--muted);
+  font-size: 0.92rem; }
+.callout { background: var(--accent-soft); border-left: 4px solid var(--accent);
+  padding: 10px 14px; border-radius: 6px; margin: 14px 0; }
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  #menu-btn { display: inline-block; }
+  aside#side { display: none; position: fixed; inset: 57px 0 0 0; z-index: 15;
+    max-height: none; background: var(--bg); border-right: 0; }
+  aside#side.open { display: block; }
+  main { padding: 16px 16px 80px; }
+  .concept { padding: 14px; }
+}
+@media print { aside#side, header.top { display: none; }
+  .layout { display: block; } }
+
+</style>
+</head>
+<body>
+<header class="top">
+<button class="btn" id="menu-btn" type="button">☰ Menu</button>
+<h1>Guia de estudo · A-Maze-ing</h1>
+<button class="btn" id="theme-btn" type="button">Claro / escuro</button>
+</header>
+<div class="layout">
+<aside id="side">
+<input id="search" type="search" placeholder="Buscar conceito..."
+ aria-label="Buscar conceito">
+<div class="progress"><span id="progress-text"></span>
+<div class="bar"><div id="progress-bar"></div></div></div>
+<nav>
+<details open><summary><a href="#inicio">Comece por aqui</a></summary>
+</details>
+<details><summary><input type="checkbox" class="read-check" value="m1" title="Marcar como lido" aria-label="Módulo 1 lido"><a href="#m1">1. Antes do código</a></summary><ul><li><a href="#c-programa">1.1 O que é um programa</a></li><li><a href="#c-terminal">1.2 Terminal e comandos</a></li><li><a href="#c-interpretador">1.3 O interpretador Python</a></li><li><a href="#c-rodar-script">1.4 Rodar um script</a></li><li><a href="#c-arquivos">1.5 Arquivos, pastas e caminhos</a></li></ul></details>
+<details><summary><input type="checkbox" class="read-check" value="m2" title="Marcar como lido" aria-label="Módulo 2 lido"><a href="#m2">2. Python básico</a></summary><ul><li><a href="#c-variaveis">2.1 Variáveis</a></li><li><a href="#c-tipos">2.2 Tipos de dados</a></li><li><a href="#c-operadores">2.3 Operadores</a></li><li><a href="#c-texto">2.4 Textos (str) e f-strings</a></li><li><a href="#c-if">2.5 Decisões: if / elif / else</a></li><li><a href="#c-lacos">2.6 Repetição: for, while e range</a></li><li><a href="#c-indentacao">2.7 Indentação e blocos</a></li></ul></details>
+<details><summary><input type="checkbox" class="read-check" value="m3" title="Marcar como lido" aria-label="Módulo 3 lido"><a href="#m3">3. Coleções</a></summary><ul><li><a href="#c-listas">3.1 Listas</a></li><li><a href="#c-grade">3.2 Lista de listas: a grade do labirinto</a></li><li><a href="#c-tuplas">3.3 Tuplas</a></li><li><a href="#c-dicionarios">3.4 Dicionários</a></li><li><a href="#c-conjuntos">3.5 Conjuntos (set)</a></li><li><a href="#c-deque">3.6 Filas (deque)</a></li><li><a href="#c-comprehension">3.7 List comprehension</a></li></ul></details>
+<details><summary><input type="checkbox" class="read-check" value="m4" title="Marcar como lido" aria-label="Módulo 4 lido"><a href="#m4">4. Organizando o código</a></summary><ul><li><a href="#c-funcoes">4.1 Funções, parâmetros e return</a></li><li><a href="#c-padrao-kwargs">4.2 Valores padrão e argumentos nomeados</a></li><li><a href="#c-import">4.3 Módulos e import</a></li><li><a href="#c-pacotes">4.4 Pacotes (pastas de módulos)</a></li><li><a href="#c-main">4.5 if __name__ == "__main__"</a></li><li><a href="#c-argv">4.6 sys.argv e sys.exit</a></li><li><a href="#c-config-arquivo">4.7 Ler um arquivo de configuração (KEY=VALUE)</a></li></ul></details>
+<details><summary><input type="checkbox" class="read-check" value="m5" title="Marcar como lido" aria-label="Módulo 5 lido"><a href="#m5">5. Objetos e classes</a></summary><ul><li><a href="#c-classe-objeto">5.1 Classe × objeto</a></li><li><a href="#c-init-self">5.2 __init__ e self</a></li><li><a href="#c-atributos-metodos">5.3 Atributos e métodos</a></li><li><a href="#c-dataclass">5.4 @dataclass</a></li><li><a href="#c-privado">5.5 Nomes "privados" (_nome)</a></li><li><a href="#c-property">5.6 @property</a></li></ul></details>
+<details><summary><input type="checkbox" class="read-check" value="m6" title="Marcar como lido" aria-label="Módulo 6 lido"><a href="#m6">6. Quando algo dá errado</a></summary><ul><li><a href="#c-excecoes">6.1 Exceções e tracebacks</a></li><li><a href="#c-try-except">6.2 try / except</a></li><li><a href="#c-raise">6.3 raise e exceções próprias</a></li><li><a href="#c-with">6.4 with (gerenciador de contexto)</a></li><li><a href="#c-stderr">6.5 stdout × stderr</a></li><li><a href="#c-defensiva">6.6 Programação defensiva</a></li><li><a href="#c-regex">6.7 Expressões regulares (o essencial)</a></li></ul></details>
+<details><summary><input type="checkbox" class="read-check" value="m7" title="Marcar como lido" aria-label="Módulo 7 lido"><a href="#m7">7. Código de qualidade</a></summary><ul><li><a href="#c-type-hints">7.1 Type hints (dicas de tipo)</a></li><li><a href="#c-mypy">7.2 mypy</a></li><li><a href="#c-docstrings">7.3 Docstrings (PEP 257)</a></li><li><a href="#c-flake8">7.4 flake8 e PEP 8</a></li><li><a href="#c-pytest">7.5 Testes com pytest</a></li><li><a href="#c-testar-muitos">7.6 Testar muitas entradas</a></li></ul></details>
+<details><summary><input type="checkbox" class="read-check" value="m8" title="Marcar como lido" aria-label="Módulo 8 lido"><a href="#m8">8. Números por dentro</a></summary><ul><li><a href="#c-binario">8.1 Binário</a></li><li><a href="#c-hexadecimal">8.2 Hexadecimal</a></li><li><a href="#c-flags">8.3 Bits como interruptores (flags)</a></li><li><a href="#c-bitwise">8.4 Operadores de bits: & | ~</a></li><li><a href="#c-widget-decoder">8.5 Experimente: decodificador de célula</a></li><li><a href="#c-parede-compartilhada">8.6 Paredes compartilhadas e coerência</a></li></ul></details>
+<details><summary><input type="checkbox" class="read-check" value="m9" title="Marcar como lido" aria-label="Módulo 9 lido"><a href="#m9">9. O labirinto como grafo</a></summary><ul><li><a href="#c-coordenadas">9.1 Grade e coordenadas</a></li><li><a href="#c-vizinhos">9.2 Vizinhos e limites</a></li><li><a href="#c-grafo">9.3 Grafo: nós e arestas</a></li><li><a href="#c-arvore">9.4 Árvore, ciclo e labirinto perfeito</a></li><li><a href="#c-beco">9.5 Beco sem saída (dead end)</a></li><li><a href="#c-area-3x3">9.6 Área aberta 3x3</a></li><li><a href="#c-padrao-42">9.7 O padrão "42"</a></li></ul></details>
+<details><summary><input type="checkbox" class="read-check" value="m10" title="Marcar como lido" aria-label="Módulo 10 lido"><a href="#m10">10. Algoritmos</a></summary><ul><li><a href="#c-aleatoriedade">10.1 Aleatoriedade e seed</a></li><li><a href="#c-widget-seed">10.2 Experimente: seed e arquivo de saída</a></li><li><a href="#c-pilha-fila">10.3 Pilha × fila</a></li><li><a href="#c-recursao">10.4 Recursão e o limite de recursão</a></li><li><a href="#c-dfs">10.5 DFS: o "recursive backtracker"</a></li><li><a href="#c-prim-kruskal">10.6 Prim e Kruskal (outros algoritmos)</a></li><li><a href="#c-bfs">10.7 BFS: o caminho mais curto</a></li><li><a href="#c-braiding">10.8 Braiding: tirar os becos sem saída</a></li><li><a href="#c-custo">10.9 Custo: quanto demora?</a></li></ul></details>
+<details><summary><input type="checkbox" class="read-check" value="m11" title="Marcar como lido" aria-label="Módulo 11 lido"><a href="#m11">11. Interface no terminal</a></summary><ul><li><a href="#c-input-menu">11.1 input() e o laço do menu</a></li><li><a href="#c-ansi">11.2 Cores com códigos ANSI</a></li><li><a href="#c-tiles">11.3 Desenhar uma grade como ladrilhos</a></li><li><a href="#c-ctrl-c">11.4 Ctrl+C e Ctrl+D</a></li><li><a href="#c-callback">11.5 Funções como valores (callbacks)</a></li></ul></details>
+<details><summary><input type="checkbox" class="read-check" value="m12" title="Marcar como lido" aria-label="Módulo 12 lido"><a href="#m12">12. Ferramentas do ecossistema</a></summary><ul><li><a href="#c-git">12.1 Git e .gitignore</a></li><li><a href="#c-venv">12.2 Ambiente virtual (venv)</a></li><li><a href="#c-pip">12.3 pip e requirements.txt</a></li><li><a href="#c-pacote">12.4 Pacote: pyproject.toml, .whl e .tar.gz</a></li><li><a href="#c-makefile">12.5 Makefile</a></li><li><a href="#c-licenca">12.6 Licença de software (MIT)</a></li></ul></details>
+<details><summary><a href="#glossario">Glossário</a></summary></details>
+<details><summary><a href="#defesa">Roteiro da defesa</a></summary></details>
+</nav>
+</aside>
+<main>
+
+<section id="inicio">
+<h2>Comece por aqui</h2>
+<p>Este guia explica <strong>todos os conceitos usados no projeto
+A-Maze-ing</strong>, do zero: pressupõe que você nunca programou e está vendo
+Python pela primeira vez. Cada conceito segue o mesmo roteiro:</p>
+<ol>
+<li><span class="tag ok">Em uma frase</span> o que é, sem jargão;</li>
+<li><span class="tag">Analogia</span> uma comparação com o dia a dia;</li>
+<li>um <strong>exemplo</strong> curto de Python, com a <strong>saída</strong>
+(todos foram executados para conferir);</li>
+<li><span class="tag">No projeto</span> onde aparece no código real;</li>
+<li><span class="tag warn">Erro comum</span> o que costuma dar errado;</li>
+<li><strong>Teste rápido</strong>: tente responder antes de abrir a
+resposta.</li>
+</ol>
+<div class="callout"><strong>Como estudar:</strong> siga a ordem dos módulos
+(1 a 12), rode os exemplos no seu computador (copie para um arquivo
+<code>.py</code> ou use o modo interativo do <code>python3</code>) e use as
+animações dos módulos 8 e 10. Marque cada módulo como lido na barra
+lateral. Na defesa, você precisará <em>explicar</em> o código, e não
+apenas mostrá-lo.</div>
+
+<h3>O que o programa faz, em 6 passos</h3>
+<div class="flow">
+<div class="box"><b>1. Config</b>lê <code>config.txt</code> (WIDTH, HEIGHT,
+ENTRY...)</div><div class="arrow">→</div>
+<div class="box"><b>2. Valida</b>detecta erros e explica, sem quebrar</div>
+<div class="arrow">→</div>
+<div class="box"><b>3. Gera</b><code>MazeGenerator</code> cria o labirinto
+(DFS, e braiding se não for perfeito)</div><div class="arrow">→</div>
+<div class="box"><b>4. Resolve</b>BFS acha o caminho mais curto</div>
+<div class="arrow">→</div>
+<div class="box"><b>5. Salva</b>um dígito hex por célula, entrada, saída,
+caminho</div><div class="arrow">→</div>
+<div class="box"><b>6. Mostra</b>desenho colorido e menu interativo</div>
+</div>
+
+<h3>Mapa dos arquivos</h3>
+<table class="files">
+<tr><th>Arquivo</th><th>Para que serve</th><th>Módulos do guia</th></tr>
+<tr><td><code>a_maze_ing.py</code></td><td>Programa principal: junta tudo e
+trata qualquer erro.</td><td>1, 4, 6</td></tr>
+<tr><td><code>app/config.py</code></td><td>Lê e valida o arquivo de
+configuração.</td><td>3, 4, 6</td></tr>
+<tr><td><code>app/output.py</code></td><td>Escreve o arquivo de saída
+(hexadecimal).</td><td>6, 8</td></tr>
+<tr><td><code>app/render.py</code></td><td>Desenho colorido no terminal e
+menu.</td><td>11</td></tr>
+<tr><td><code>mazegen/generator.py</code></td><td>A classe
+<code>MazeGenerator</code>: gera, resolve, inspeciona.</td>
+<td>5, 8, 9, 10</td></tr>
+<tr><td><code>mazegen/pattern.py</code></td><td>O desenho do "42".</td>
+<td>9</td></tr>
+<tr><td><code>tests/</code></td><td>Testes automáticos (pytest).</td>
+<td>7</td></tr>
+<tr><td><code>Makefile</code>, <code>pyproject.toml</code>,
+<code>requirements.txt</code></td><td>Automação, empacotamento e
+dependências.</td><td>12</td></tr>
+</table>
+</section>
+
+<section class="module" id="m1"><h2><span class="mod-num">Módulo 1.</span> Antes do código</h2><p class="module-intro">Antes de escrever uma linha, você precisa saber <strong>o que é um programa</strong> e como conversar com o computador. Este módulo não exige nenhum conhecimento prévio.</p><article class="concept" id="c-programa">
+<h3><span class="num">1.1</span>O que é um programa</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Uma lista de instruções que o computador executa, uma depois da outra.</p>
+<p class="analogy"><span class="tag">Analogia</span> Uma receita de bolo. O computador é um cozinheiro <em>muito</em> literal: faz exatamente o que está escrito, na ordem escrita, sem adivinhar a intenção.</p>
+<pre><code data-lang="py"># Um programa de 3 instruções
+print(&quot;Olá!&quot;)
+print(&quot;Vamos criar um labirinto&quot;)
+print(&quot;Fim&quot;)</code></pre>
+<div class="out"><div class="lbl">Saída</div><pre>Olá!
+Vamos criar um labirinto
+Fim</pre></div>
+<p class="where"><span class="tag">No projeto</span> <code>a_maze_ing.py</code> é o programa inteiro: lê a configuração, gera o labirinto, salva o arquivo e mostra o menu, nessa ordem.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Achar que o computador "entende o que você quis dizer". Uma letra errada muda tudo, e o programa só faz o que foi escrito.</p>
+<details class="quiz"><summary>Teste rápido: Por que a ordem das instruções importa?</summary><p>Porque elas rodam de cima para baixo. Usar algo antes de criá-lo, por exemplo, dá erro.</p></details>
+</article>
+<article class="concept" id="c-terminal">
+<h3><span class="num">1.2</span>Terminal e comandos</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Uma janela onde você dá ordens ao computador digitando texto.</p>
+<p class="analogy"><span class="tag">Analogia</span> Trocar mensagens de texto com o computador: você escreve um comando, ele responde.</p>
+<pre><code data-lang="sh">pwd              # onde estou? (mostra a pasta atual)
+ls               # o que existe aqui?
+cd amazeing      # entra na pasta &quot;amazeing&quot;
+cd ..            # volta uma pasta</code></pre>
+<p class="where"><span class="tag">No projeto</span> Tudo no projeto é rodado no terminal: <code>make run</code>, <code>python3 a_maze_ing.py config.txt</code>, <code>make lint</code>.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> <code>command not found</code> quase sempre é erro de digitação ou programa não instalado. <code>No such file or directory</code> é pasta errada: use <code>pwd</code> e <code>ls</code> para se localizar.</p>
+<details class="quiz"><summary>Teste rápido: O que faz <code>cd ..</code>?</summary><p>Volta para a pasta de cima (a pasta "pai").</p></details>
+</article>
+<article class="concept" id="c-interpretador">
+<h3><span class="num">1.3</span>O interpretador Python</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> O programa que lê um arquivo <code>.py</code> e executa as instruções dele.</p>
+<p class="analogy"><span class="tag">Analogia</span> Um intérprete simultâneo: ouve uma frase em Python, traduz e executa na hora, frase por frase.</p>
+<pre><code data-lang="sh">python3 --version     # mostra a versão instalada
+python3               # abre o modo interativo (&gt;&gt;&gt;); saia com Ctrl+D</code></pre>
+<p class="where"><span class="tag">No projeto</span> O projeto exige Python 3.10 ou mais novo, porque usa escritas como <code>int | None</code> e <code>list[int]</code>.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Usar <code>python</code> em vez de <code>python3</code> (em alguns computadores <code>python</code> é a versão 2 ou nem existe), ou uma versão antiga demais.</p>
+<details class="quiz"><summary>Teste rápido: Para que serve o modo interativo (<code>>>></code>)?</summary><p>Para testar uma linha de Python e ver o resultado na hora, sem criar arquivo.</p></details>
+</article>
+<article class="concept" id="c-rodar-script">
+<h3><span class="num">1.4</span>Rodar um script</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Pedir ao interpretador que execute um arquivo <code>.py</code>, entregando a ele, se preciso, argumentos.</p>
+<p class="analogy"><span class="tag">Analogia</span> Abrir um programa e entregar um documento para ele abrir.</p>
+<pre><code data-lang="sh">python3 a_maze_ing.py config.txt
+#  |        |            |
+#  |        |            +-- argumento: o arquivo de configuração
+#  |        +--------------- o script (nosso programa)
+#  +------------------------ o interpretador</code></pre>
+<p class="where"><span class="tag">No projeto</span> É exatamente o comando exigido pelo enunciado. O programa recebe <em>só</em> o nome da configuração.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Rodar de outra pasta: o Python não acha <code>a_maze_ing.py</code> nem <code>config.txt</code>. Confira com <code>ls</code>.</p>
+<details class="quiz"><summary>Teste rápido: Se esqueço o <code>config.txt</code>, o que acontece no nosso programa?</summary><p>Ele imprime a mensagem de uso (<code>Usage: python3 a_maze_ing.py config.txt</code>) e termina com código 2, sem quebrar.</p></details>
+</article>
+<article class="concept" id="c-arquivos">
+<h3><span class="num">1.5</span>Arquivos, pastas e caminhos</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Um arquivo guarda dados; um caminho diz onde ele está.</p>
+<p class="analogy"><span class="tag">Analogia</span> Caminho absoluto é o endereço completo da casa ("Rua X, 10"); caminho relativo é "a segunda porta à direita", que depende de onde você está.</p>
+<pre><code data-lang="sh">/Users/ana/amazeing/maze.txt   # absoluto: funciona de qualquer lugar
+maze.txt                      # relativo: na pasta onde o programa roda
+tests/helpers.py              # relativo: dentro da subpasta tests</code></pre>
+<p class="where"><span class="tag">No projeto</span> <code>OUTPUT_FILE=maze.txt</code> é relativo: o arquivo nasce na pasta onde você rodou o programa.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Dizer que o arquivo "sumiu": ele foi criado em outra pasta, a atual no momento da execução.</p>
+<details class="quiz"><summary>Teste rápido: O que é um arquivo de texto?</summary><p>Um arquivo cujo conteúdo são só caracteres legíveis, como o <code>config.txt</code> e o arquivo do labirinto.</p></details>
+</article></section>
+<section class="module" id="m2"><h2><span class="mod-num">Módulo 2.</span> Python básico</h2><p class="module-intro">Os blocos de construção de qualquer programa: guardar valores, decidir e repetir.</p><article class="concept" id="c-variaveis">
+<h3><span class="num">2.1</span>Variáveis</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Um nome que guarda um valor.</p>
+<p class="analogy"><span class="tag">Analogia</span> Uma etiqueta colada numa caixa: a caixa guarda o valor, a etiqueta é o nome pelo qual você chama.</p>
+<pre><code data-lang="py">width = 20
+height = 15
+cells = width * height
+print(cells)</code></pre>
+<div class="out"><div class="lbl">Saída</div><pre>300</pre></div>
+<p class="where"><span class="tag">No projeto</span> No <code>MazeGenerator.__init__</code>: <code>self.width = width</code> guarda o valor recebido para usar depois.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Confundir <code>=</code> (guardar um valor) com <code>==</code> (comparar). Usar um nome antes de criá-lo dá <code>NameError</code>.</p>
+<details class="quiz"><summary>Teste rápido: Depois de <code>x = 5</code> e <code>x = x + 1</code>, quanto vale <code>x</code>?</summary><p>6. Primeiro calcula-se o lado direito (5 + 1) e o resultado volta para <code>x</code>.</p></details>
+</article>
+<article class="concept" id="c-tipos">
+<h3><span class="num">2.2</span>Tipos de dados</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Cada valor tem um tipo que diz o que ele é e o que dá para fazer com ele.</p>
+<p class="analogy"><span class="tag">Analogia</span> Recipientes diferentes para coisas diferentes: copo para líquido, caixa para objetos. Número soma; texto junta.</p>
+<pre><code data-lang="py">width = 20            # int: número inteiro
+name = &quot;maze.txt&quot;     # str: texto
+perfect = True        # bool: verdadeiro ou falso
+seed = None           # None: &quot;nenhum valor&quot;
+print(type(width), type(perfect))</code></pre>
+<div class="out"><div class="lbl">Saída</div><pre>&lt;class &#x27;int&#x27;&gt; &lt;class &#x27;bool&#x27;&gt;</pre></div>
+<p class="where"><span class="tag">No projeto</span> <code>MazeConfig</code> declara <code>width: int</code>, <code>output_file: str</code>, <code>perfect: bool</code> e <code>seed: int | None</code>.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Tudo o que vem de um arquivo é <em>texto</em>. <code>"20" + 1</code> dá erro; é preciso converter com <code>int("20")</code>.</p>
+<details class="quiz"><summary>Teste rápido: Qual o tipo de <code>"20"</code> (com aspas)?</summary><p><code>str</code> (texto), não número.</p></details>
+</article>
+<article class="concept" id="c-operadores">
+<h3><span class="num">2.3</span>Operadores</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Símbolos que calculam ou comparam: <code>+ - * / // % == != < > and or not</code>.</p>
+<p class="analogy"><span class="tag">Analogia</span> Os botões de uma calculadora, mais perguntas de sim ou não ("3 é menor que 5?").</p>
+<pre><code data-lang="py">print(7 // 2)                # divisão inteira
+print(7 % 2)                 # resto da divisão
+print(7 / 2)                 # divisão comum
+print(3 &lt; 5 and 2 == 2)      # as duas coisas são verdade?</code></pre>
+<div class="out"><div class="lbl">Saída</div><pre>3
+1
+3.5
+True</pre></div>
+<p class="where"><span class="tag">No projeto</span> <code>width % 2</code> diz se a largura é ímpar; <code>(width - block_width) // 2</code> centraliza o "42" (em <code>mazegen/pattern.py</code>).</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> <code>/</code> sempre devolve número com vírgula (<code>float</code>). Para posições em grade use <code>//</code>.</p>
+<details class="quiz"><summary>Teste rápido: Quanto é <code>20 % 2</code> e o que isso significa?</summary><p>0: não sobra resto, então 20 é par.</p></details>
+</article>
+<article class="concept" id="c-texto">
+<h3><span class="num">2.4</span>Textos (str) e f-strings</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Texto fica entre aspas; uma f-string deixa encaixar valores dentro dele com <code>{...}</code>.</p>
+<p class="analogy"><span class="tag">Analogia</span> Um formulário com lacunas: "Entrada: ___,___", e o Python preenche.</p>
+<pre><code data-lang="py">x, y = 3, 4
+print(f&quot;Entrada: {x},{y}&quot;)
+print(&quot;Linha 1\nLinha 2&quot;)      # \n = quebra de linha
+line = &quot;  width = 20  &quot;
+print(line.strip().upper())    # tira espaços e põe em maiúsculas</code></pre>
+<div class="out"><div class="lbl">Saída</div><pre>Entrada: 3,4
+Linha 1
+Linha 2
+WIDTH = 20</pre></div>
+<p class="where"><span class="tag">No projeto</span> <code>format_maze</code> monta o arquivo de saída com f-strings: <code>f"{maze.entry[0]},{maze.entry[1]}\n"</code>.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Esquecer o <code>f</code> antes das aspas: o programa imprime <code>{x}</code> literalmente.</p>
+<details class="quiz"><summary>Teste rápido: O que <code>"a,b".split(",")</code> devolve?</summary><p>Uma lista: <code>['a', 'b']</code>. É assim que separamos <code>x,y</code> nas coordenadas.</p></details>
+</article>
+<article class="concept" id="c-if">
+<h3><span class="num">2.5</span>Decisões: if / elif / else</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Executa um bloco só se uma condição for verdadeira.</p>
+<p class="analogy"><span class="tag">Analogia</span> Uma bifurcação: "se estiver chovendo, leve guarda-chuva; senão, óculos de sol".</p>
+<pre><code data-lang="py">width = 250
+if width &lt; 1:
+    print(&quot;pequeno demais&quot;)
+elif width &gt; 200:
+    print(&quot;grande demais&quot;)
+else:
+    print(&quot;ok&quot;)</code></pre>
+<div class="out"><div class="lbl">Saída</div><pre>grande demais</pre></div>
+<p class="where"><span class="tag">No projeto</span> <code>_parse_size</code> em <code>app/config.py</code> recusa tamanhos fora de 1 a 200; <code>run_menu</code> escolhe a ação pela tecla digitada.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Esquecer os dois-pontos <code>:</code> no fim da linha ou errar a indentação (<code>SyntaxError</code>).</p>
+<details class="quiz"><summary>Teste rápido: Quando o <code>else</code> executa?</summary><p>Quando nenhuma das condições anteriores (<code>if</code> e <code>elif</code>) foi verdadeira.</p></details>
+</article>
+<article class="concept" id="c-lacos">
+<h3><span class="num">2.6</span>Repetição: for, while e range</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> <code>for</code> repete para cada item; <code>while</code> repete enquanto uma condição valer.</p>
+<p class="analogy"><span class="tag">Analogia</span> <code>for</code>: "para cada prato da pilha, lave". <code>while</code>: "enquanto houver prato sujo, lave".</p>
+<pre><code data-lang="py">for y in range(2):          # y = 0, 1
+    for x in range(3):      # x = 0, 1, 2
+        print(f&quot;({x},{y})&quot;, end=&quot; &quot;)
+    print()                 # pula de linha ao fim de cada linha</code></pre>
+<div class="out"><div class="lbl">Saída</div><pre>(0,0) (1,0) (2,0) 
+(0,1) (1,1) (2,1) </pre></div>
+<p class="where"><span class="tag">No projeto</span> Percorrer toda a grade: <code>for y in range(self.height): for x in range(self.width)</code>. O DFS usa <code>while stack:</code> e o menu usa <code>while True:</code>.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> <code>range(3)</code> vai de 0 a 2 (não inclui o 3). Um <code>while</code> cuja condição nunca muda roda para sempre: pare com Ctrl+C.</p>
+<details class="quiz"><summary>Teste rápido: O que <code>range(1, 4)</code> gera?</summary><p>1, 2 e 3 (o limite final não entra).</p></details>
+</article>
+<article class="concept" id="c-indentacao">
+<h3><span class="num">2.7</span>Indentação e blocos</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Em Python, o recuo (4 espaços) define quais linhas pertencem a um bloco.</p>
+<p class="analogy"><span class="tag">Analogia</span> Itens e subitens de uma lista: o recuo mostra o que está dentro de quê.</p>
+<pre><code data-lang="py">for n in range(3):
+    if n == 1:
+        print(&quot;meio&quot;)      # dentro do if, dentro do for
+    print(&quot;fim da volta&quot;)  # só dentro do for
+print(&quot;acabou&quot;)            # fora de tudo</code></pre>
+<div class="out"><div class="lbl">Saída</div><pre>fim da volta
+meio
+fim da volta
+fim da volta
+acabou</pre></div>
+<p class="where"><span class="tag">No projeto</span> Em todo o código. O <code>flake8</code> reclama de recuos irregulares.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Misturar tab com espaços ou recuar com quantidades diferentes: <code>IndentationError</code>.</p>
+<details class="quiz"><summary>Teste rápido: No exemplo, quantas vezes aparece "fim da volta"?</summary><p>3, uma por volta do <code>for</code>.</p></details>
+</article></section>
+<section class="module" id="m3"><h2><span class="mod-num">Módulo 3.</span> Coleções</h2><p class="module-intro">Como guardar <em>muitos</em> valores juntos. O labirinto inteiro é uma coleção de coleções.</p><article class="concept" id="c-listas">
+<h3><span class="num">3.1</span>Listas</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Uma sequência ordenada e alterável de valores.</p>
+<p class="analogy"><span class="tag">Analogia</span> Uma fila de caixinhas numeradas a partir do zero.</p>
+<pre><code data-lang="py">dirs = [&quot;N&quot;, &quot;E&quot;, &quot;S&quot;, &quot;W&quot;]
+dirs.append(&quot;X&quot;)                    # adiciona no fim
+print(dirs[0], len(dirs), dirs[-1])   # primeiro, tamanho, último</code></pre>
+<div class="out"><div class="lbl">Saída</div><pre>N 5 X</pre></div>
+<p class="where"><span class="tag">No projeto</span> <code>stack = [self.entry]</code>, <code>stack.append(...)</code> e <code>stack.pop()</code> no DFS; o caminho (<code>solve_cells</code>) é uma lista de células.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Os índices começam em 0: numa lista de 4 itens o último é <code>[3]</code>; <code>[4]</code> dá <code>IndexError</code>.</p>
+<details class="quiz"><summary>Teste rápido: Em <code>dirs</code> acima (antes do append), quanto é <code>dirs[1]</code>?</summary><p><code>"E"</code>, porque o primeiro é o índice 0.</p></details>
+</article>
+<article class="concept" id="c-grade">
+<h3><span class="num">3.2</span>Lista de listas: a grade do labirinto</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Uma lista cujos itens são listas, formando linhas e colunas.</p>
+<p class="analogy"><span class="tag">Analogia</span> Uma planilha: primeiro escolhe a linha, depois a coluna.</p>
+<pre><code data-lang="py">grid = [[15] * 3 for _ in range(2)]   # 2 linhas x 3 colunas
+grid[1][2] = 7                        # linha 1, coluna 2
+print(grid)</code></pre>
+<div class="out"><div class="lbl">Saída</div><pre>[[15, 15, 15], [15, 15, 7]]</pre></div>
+<p class="where"><span class="tag">No projeto</span> <code>self.grid = [[ALL_WALLS] * self.width for _ in range(self.height)]</code>. Acessamos a célula <code>(x, y)</code> como <code>grid[y][x]</code>: <strong>linha primeiro</strong>.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> <code>[[0]*3]*2</code> cria duas linhas que são a <em>mesma</em> lista: mudar uma muda a outra. Por isso usamos a construção com <code>for</code>.</p>
+<details class="quiz"><summary>Teste rápido: A célula x=5, y=2 é <code>grid[2][5]</code> ou <code>grid[5][2]</code>?</summary><p><code>grid[2][5]</code>: índice da linha (y) primeiro.</p></details>
+</article>
+<article class="concept" id="c-tuplas">
+<h3><span class="num">3.3</span>Tuplas</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Como uma lista, mas imutável: depois de criada não muda.</p>
+<p class="analogy"><span class="tag">Analogia</span> Um par de coordenadas escrito a caneta: dá para ler, não dá para alterar.</p>
+<pre><code data-lang="py">entry = (0, 0)
+x, y = entry                  # &quot;desempacota&quot; a tupla em duas variáveis
+print(x, y, entry == (0, 0))
+# entry[0] = 5   -&gt; TypeError: tupla não aceita alteração</code></pre>
+<div class="out"><div class="lbl">Saída</div><pre>0 0 True</pre></div>
+<p class="where"><span class="tag">No projeto</span> Coordenadas <code>(x, y)</code>: <code>entry</code>, <code>exit</code> e as células do conjunto <code>pattern_cells</code>.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Tentar alterar um item. Para "mudar", crie outra tupla.</p>
+<details class="quiz"><summary>Teste rápido: Por que tuplas podem estar dentro de um conjunto (<code>set</code>) e listas não?</summary><p>Porque são imutáveis: um valor que não muda pode ser usado como "chave" de busca.</p></details>
+</article>
+<article class="concept" id="c-dicionarios">
+<h3><span class="num">3.4</span>Dicionários</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Uma coleção de pares <em>chave → valor</em>.</p>
+<p class="analogy"><span class="tag">Analogia</span> Uma agenda de contatos: você procura pelo nome (chave) e obtém o telefone (valor).</p>
+<pre><code data-lang="py">pairs = {&quot;WIDTH&quot;: &quot;20&quot;, &quot;HEIGHT&quot;: &quot;15&quot;}
+pairs[&quot;PERFECT&quot;] = &quot;True&quot;
+print(pairs[&quot;WIDTH&quot;], &quot;SEED&quot; in pairs, pairs.get(&quot;SEED&quot;, &quot;nenhuma&quot;))</code></pre>
+<div class="out"><div class="lbl">Saída</div><pre>20 False nenhuma</pre></div>
+<p class="where"><span class="tag">No projeto</span> <code>_read_pairs</code> transforma o arquivo de configuração num dicionário; <code>_DELTAS</code> liga cada direção a <code>(dx, dy)</code>.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Pedir uma chave que não existe (<code>pairs["SEED"]</code>) dá <code>KeyError</code>. Use <code>in</code> ou <code>.get()</code>.</p>
+<details class="quiz"><summary>Teste rápido: O que <code>pairs.get("X", 0)</code> devolve se não existe a chave X?</summary><p>O valor padrão, <code>0</code>, sem erro.</p></details>
+</article>
+<article class="concept" id="c-conjuntos">
+<h3><span class="num">3.5</span>Conjuntos (set)</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Uma coleção sem repetidos, ótima para perguntar "este item está aqui?".</p>
+<p class="analogy"><span class="tag">Analogia</span> A lista de convidados na portaria: cada nome aparece uma vez e conferir é rápido.</p>
+<pre><code data-lang="py">visited = {(0, 0)}
+visited.add((1, 0))
+visited.add((1, 0))                  # repetido: ignorado
+print(len(visited), (1, 0) in visited)</code></pre>
+<div class="out"><div class="lbl">Saída</div><pre>2 True</pre></div>
+<p class="where"><span class="tag">No projeto</span> <code>visited</code> nos algoritmos de geração, <code>on_path</code> no desenho e <code>pattern_cells</code> (um <code>frozenset</code>, conjunto imutável).</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> <code>{}</code> vazio é um dicionário, não um conjunto. Conjunto vazio é <code>set()</code>.</p>
+<details class="quiz"><summary>Teste rápido: Por que usar <code>set</code> em vez de lista para as células visitadas?</summary><p>Verificar se uma célula está num conjunto é quase instantâneo; numa lista grande é lento.</p></details>
+</article>
+<article class="concept" id="c-deque">
+<h3><span class="num">3.6</span>Filas (deque)</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Uma lista otimizada para tirar itens do começo: o primeiro a entrar é o primeiro a sair.</p>
+<p class="analogy"><span class="tag">Analogia</span> A fila do banco.</p>
+<pre><code data-lang="py">from collections import deque
+
+queue = deque([&quot;a&quot;, &quot;b&quot;])
+queue.append(&quot;c&quot;)           # entra no fim
+print(queue.popleft())      # sai do começo
+print(list(queue))</code></pre>
+<div class="out"><div class="lbl">Saída</div><pre>a
+[&#x27;b&#x27;, &#x27;c&#x27;]</pre></div>
+<p class="where"><span class="tag">No projeto</span> A busca em largura (BFS) em <code>MazeGenerator.solve_cells</code>.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Usar <code>lista.pop(0)</code> numa fila grande é lento; <code>deque.popleft()</code> é rápido.</p>
+<details class="quiz"><summary>Teste rápido: Fila e pilha tiram o item de onde?</summary><p>Fila: do começo (FIFO). Pilha: do fim, o último que entrou (LIFO).</p></details>
+</article>
+<article class="concept" id="c-comprehension">
+<h3><span class="num">3.7</span>List comprehension</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Uma forma curta de criar uma lista a partir de outra, com filtro opcional.</p>
+<p class="analogy"><span class="tag">Analogia</span> "Separe só as peças vermelhas desta caixa" em uma frase.</p>
+<pre><code data-lang="py">pares = [n for n in range(10) if n % 2 == 0]
+print(pares)
+dobros = [n * 2 for n in range(4)]
+print(dobros)</code></pre>
+<div class="out"><div class="lbl">Saída</div><pre>[0, 2, 4, 6, 8]
+[0, 2, 4, 6]</pre></div>
+<p class="where"><span class="tag">No projeto</span> <code>options = [n for n in self._free_neighbours(x, y) if (n[0], n[1]) not in visited]</code>: vizinhos ainda não visitados.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Compressões muito longas ficam ilegíveis: nesse caso use um <code>for</code> normal.</p>
+<details class="quiz"><summary>Teste rápido: O que <code>[c for c in "abc"]</code> devolve?</summary><p><code>['a', 'b', 'c']</code>.</p></details>
+</article></section>
+<section class="module" id="m4"><h2><span class="mod-num">Módulo 4.</span> Organizando o código</h2><p class="module-intro">Como dividir um programa em pedaços reutilizáveis: funções, arquivos e pastas.</p><article class="concept" id="c-funcoes">
+<h3><span class="num">4.1</span>Funções, parâmetros e return</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Um bloco de código com nome, que recebe entradas (parâmetros) e devolve um resultado.</p>
+<p class="analogy"><span class="tag">Analogia</span> Uma máquina de suco: você coloca frutas (parâmetros) e ela devolve o suco (<code>return</code>).</p>
+<pre><code data-lang="py">def area(width, height):
+    return width * height
+
+print(area(20, 15))</code></pre>
+<div class="out"><div class="lbl">Saída</div><pre>300</pre></div>
+<p class="where"><span class="tag">No projeto</span> <code>format_maze(maze)</code> recebe o labirinto e <em>devolve</em> o texto do arquivo; <code>write_output</code> grava esse texto.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Esquecer o <code>return</code>: a função devolve <code>None</code>. Esquecer os parênteses: <code>area</code> é a função, <code>area(2, 3)</code> é o resultado.</p>
+<details class="quiz"><summary>Teste rápido: O que uma função sem <code>return</code> devolve?</summary><p><code>None</code> (nada).</p></details>
+</article>
+<article class="concept" id="c-padrao-kwargs">
+<h3><span class="num">4.2</span>Valores padrão e argumentos nomeados</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Um parâmetro pode ter valor padrão, e na chamada podemos escrever <code>nome=valor</code>.</p>
+<p class="analogy"><span class="tag">Analogia</span> Pedir um café: se você não disser nada vem "com açúcar" (padrão); você pode pedir "sem açúcar" pelo nome da opção.</p>
+<pre><code data-lang="py">def greet(name, punct=&quot;!&quot;):
+    return &quot;Oi, &quot; + name + punct
+
+print(greet(&quot;Ana&quot;))
+print(greet(&quot;Bia&quot;, punct=&quot;?&quot;))</code></pre>
+<div class="out"><div class="lbl">Saída</div><pre>Oi, Ana!
+Oi, Bia?</pre></div>
+<p class="where"><span class="tag">No projeto</span> <code>MazeGenerator(width=20, height=15, perfect=True, seed=42)</code>: <code>perfect</code> vale <code>False</code> e <code>algorithm</code> vale <code>"dfs"</code> se você não disser nada.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Usar uma lista vazia como valor padrão (<code>def f(x=[])</code>): ela é compartilhada entre chamadas. Prefira <code>None</code>.</p>
+<details class="quiz"><summary>Teste rápido: Por que <code>perfect=True</code> deixa a chamada mais legível?</summary><p>Porque o nome explica o que o valor significa, sem precisar lembrar a ordem dos parâmetros.</p></details>
+</article>
+<article class="concept" id="c-import">
+<h3><span class="num">4.3</span>Módulos e import</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Um módulo é um arquivo <code>.py</code>; <code>import</code> traz o que há nele para o seu arquivo.</p>
+<p class="analogy"><span class="tag">Analogia</span> Pegar emprestada uma ferramenta de outra caixa de ferramentas em vez de fabricá-la.</p>
+<pre><code data-lang="py">import random
+from collections import deque
+
+rng = random.Random(42)
+fila = deque()
+print(type(rng).__name__, type(fila).__name__)</code></pre>
+<div class="out"><div class="lbl">Saída</div><pre>Random deque</pre></div>
+<p class="where"><span class="tag">No projeto</span> <code>a_maze_ing.py</code> faz <code>from app.config import load_config</code> e <code>from mazegen import MazeGenerator</code>.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> <code>ModuleNotFoundError</code>: pasta errada, pacote não instalado, ou um arquivo seu com o mesmo nome de um módulo padrão (por exemplo <code>random.py</code>).</p>
+<details class="quiz"><summary>Teste rápido: Qual a diferença entre <code>import random</code> e <code>from random import Random</code>?</summary><p>O primeiro traz o módulo (usa-se <code>random.Random</code>); o segundo traz só o nome <code>Random</code>.</p></details>
+</article>
+<article class="concept" id="c-pacotes">
+<h3><span class="num">4.4</span>Pacotes (pastas de módulos)</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Uma pasta com um <code>__init__.py</code> que agrupa módulos relacionados.</p>
+<p class="analogy"><span class="tag">Analogia</span> Uma gaveta etiquetada que guarda várias pastas de documentos do mesmo assunto.</p>
+<pre><code data-lang="sh">mazegen/
+    __init__.py      # o que o pacote mostra para fora
+    generator.py     # a classe MazeGenerator
+    pattern.py       # o desenho do &quot;42&quot;</code></pre>
+<p class="where"><span class="tag">No projeto</span> <code>mazegen/</code> é o pacote reutilizável (vira o arquivo <code>.whl</code>); <code>app/</code> é só a aplicação. <code>from .generator import MazeGenerator</code> é um import <em>relativo</em> (o ponto = "nesta pasta").</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Esquecer o <code>__init__.py</code>: algumas ferramentas, como o empacotador, podem não enxergar a pasta como pacote.</p>
+<details class="quiz"><summary>Teste rápido: O que fica de fora do pacote <code>mazegen</code> e por quê?</summary><p>A leitura da configuração, o desenho e o menu: eles são da aplicação; o pacote só gera e resolve labirintos, para ser reaproveitado em outros projetos.</p></details>
+</article>
+<article class="concept" id="c-main">
+<h3><span class="num">4.5</span>if __name__ == "__main__"</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Faz um trecho rodar só quando o arquivo é executado diretamente, não quando é importado.</p>
+<p class="analogy"><span class="tag">Analogia</span> Uma tomada com interruptor: o aparelho só liga se você apertar, e não ao ser guardado na gaveta.</p>
+<pre><code data-lang="py">def main():
+    print(&quot;rodando o programa&quot;)
+
+if __name__ == &quot;__main__&quot;:
+    main()</code></pre>
+<div class="out"><div class="lbl">Saída</div><pre>rodando o programa</pre></div>
+<p class="where"><span class="tag">No projeto</span> Fim de <code>a_maze_ing.py</code>: <code>sys.exit(main(sys.argv))</code>. Assim os testes podem importar <code>a_maze_ing</code> sem disparar o menu.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Chamar <code>main()</code> fora do <code>if</code>: o programa roda ao ser importado.</p>
+<details class="quiz"><summary>Teste rápido: O que vale <code>__name__</code> quando rodamos <code>python3 a_maze_ing.py</code>?</summary><p><code>"__main__"</code>. Quando o arquivo é importado, vale o nome do módulo.</p></details>
+</article>
+<article class="concept" id="c-argv">
+<h3><span class="num">4.6</span>sys.argv e sys.exit</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> <code>sys.argv</code> é a lista do que foi digitado no comando; <code>sys.exit(n)</code> termina o programa com um código.</p>
+<p class="analogy"><span class="tag">Analogia</span> <code>argv</code> é o bilhete que o terminal entrega ao programa; o código de saída é o "deu certo (0) / deu errado (outro número)" que o programa devolve ao terminal.</p>
+<pre><code data-lang="py">import sys
+
+print(len(sys.argv) &gt;= 1)   # argv[0] é sempre o nome do script
+# Rodando:  python3 a_maze_ing.py config.txt
+# argv == [&#x27;a_maze_ing.py&#x27;, &#x27;config.txt&#x27;]
+# sys.exit(1)  -&gt; termina sinalizando erro</code></pre>
+<div class="out"><div class="lbl">Saída</div><pre>True</pre></div>
+<p class="where"><span class="tag">No projeto</span> <code>main(argv)</code> exige exatamente 2 itens (script + config) e devolve 0 (ok), 1 (erro reportado) ou 2 (uso incorreto).</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Esquecer que <code>argv[0]</code> é o nome do script: o primeiro argumento de verdade é <code>argv[1]</code>.</p>
+<details class="quiz"><summary>Teste rápido: Código de saída 0 significa o quê?</summary><p>Sucesso. Qualquer outro valor sinaliza um problema.</p></details>
+</article>
+<article class="concept" id="c-config-arquivo">
+<h3><span class="num">4.7</span>Ler um arquivo de configuração (KEY=VALUE)</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Cada linha tem uma chave e um valor separados por <code>=</code>; o programa lê e guarda num dicionário.</p>
+<p class="analogy"><span class="tag">Analogia</span> Um formulário preenchido: "Nome=Ana", "Idade=30".</p>
+<pre><code data-lang="py">line = &quot;  width = 20  &quot;
+key, value = line.split(&quot;=&quot;, 1)     # divide só no primeiro &quot;=&quot;
+print(repr(key.strip().upper()), repr(value.strip()))</code></pre>
+<div class="out"><div class="lbl">Saída</div><pre>&#x27;WIDTH&#x27; &#x27;20&#x27;</pre></div>
+<p class="where"><span class="tag">No projeto</span> <code>_read_pairs</code> em <code>app/config.py</code>: ignora linhas vazias e <code>#</code>, exige o <code>=</code> e normaliza a chave para maiúsculas.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Usar <code>split("=")</code> sem o <code>1</code>: um valor com <code>=</code> dentro viraria 3 pedaços.</p>
+<details class="quiz"><summary>Teste rápido: Para que serve <code>.strip()</code> nesse código?</summary><p>Remove os espaços do começo e do fim, para <code>WIDTH = 20</code> valer o mesmo que <code>WIDTH=20</code>.</p></details>
+</article></section>
+<section class="module" id="m5"><h2><span class="mod-num">Módulo 5.</span> Objetos e classes</h2><p class="module-intro">Como juntar dados e ações num único "objeto". O <code>MazeGenerator</code> é uma classe.</p><article class="concept" id="c-classe-objeto">
+<h3><span class="num">5.1</span>Classe × objeto</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> A classe é o molde; o objeto é cada coisa criada a partir dele.</p>
+<p class="analogy"><span class="tag">Analogia</span> A classe é a planta de uma casa; cada casa construída a partir dela é um objeto.</p>
+<pre><code data-lang="py">class Dog:
+    def __init__(self, name):
+        self.name = name
+
+    def bark(self):
+        return f&quot;{self.name}: au!&quot;
+
+rex = Dog(&quot;Rex&quot;)
+bia = Dog(&quot;Bia&quot;)
+print(rex.bark(), bia.bark())</code></pre>
+<div class="out"><div class="lbl">Saída</div><pre>Rex: au! Bia: au!</pre></div>
+<p class="where"><span class="tag">No projeto</span> <code>MazeGenerator</code> é a classe; <code>gen = MazeGenerator(...)</code> cria um labirinto concreto, e cada objeto tem sua própria grade e seed.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Esquecer o <code>self</code> como primeiro parâmetro dos métodos (<code>TypeError</code> ao chamar).</p>
+<details class="quiz"><summary>Teste rápido: Quantos objetos <code>Dog</code> existem no exemplo?</summary><p>Dois: <code>rex</code> e <code>bia</code>, da mesma classe.</p></details>
+</article>
+<article class="concept" id="c-init-self">
+<h3><span class="num">5.2</span>__init__ e self</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> <code>__init__</code> roda quando o objeto é criado; <code>self</code> é "este objeto".</p>
+<p class="analogy"><span class="tag">Analogia</span> <code>__init__</code> é a montagem da casa (paredes, portas); <code>self</code> é a palavra "minha": <code>self.name</code> = "o nome <em>deste</em> cachorro".</p>
+<pre><code data-lang="py">class Counter:
+    def __init__(self, start=0):
+        self.value = start        # guarda dentro do objeto
+
+    def up(self):
+        self.value += 1
+
+c = Counter(10)
+c.up()
+c.up()
+print(c.value)</code></pre>
+<div class="out"><div class="lbl">Saída</div><pre>12</pre></div>
+<p class="where"><span class="tag">No projeto</span> <code>MazeGenerator.__init__</code> guarda tamanho, entrada, saída, seed... e <em>valida</em> tudo, levantando <code>ValueError</code> se algo for inconsistente.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Atribuir a uma variável simples (<code>value = start</code>) em vez de <code>self.value</code>: o dado some ao fim do método.</p>
+<details class="quiz"><summary>Teste rápido: Quando o <code>__init__</code> é chamado?</summary><p>Automaticamente, ao escrever <code>Counter(10)</code>.</p></details>
+</article>
+<article class="concept" id="c-atributos-metodos">
+<h3><span class="num">5.3</span>Atributos e métodos</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Atributo é um dado do objeto; método é uma ação que ele sabe fazer.</p>
+<p class="analogy"><span class="tag">Analogia</span> A cor do carro é um atributo; acelerar é um método.</p>
+<pre><code data-lang="py">class Box:
+    def __init__(self):
+        self.items = []             # atributo
+
+    def add(self, item):            # método
+        self.items.append(item)
+
+b = Box()
+b.add(&quot;lápis&quot;)
+print(b.items, len(b.items))</code></pre>
+<div class="out"><div class="lbl">Saída</div><pre>[&#x27;lápis&#x27;] 1</pre></div>
+<p class="where"><span class="tag">No projeto</span> <code>gen.grid</code>, <code>gen.seed</code> (atributos) e <code>gen.generate()</code>, <code>gen.solve()</code> (métodos).</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Chamar um método sem parênteses: <code>gen.solve</code> é o método em si, <code>gen.solve()</code> executa e devolve o caminho.</p>
+<details class="quiz"><summary>Teste rápido: <code>gen.grid</code> e <code>gen.solve()</code>: qual é dado e qual é ação?</summary><p><code>grid</code> é um atributo (dado); <code>solve()</code> é um método (ação).</p></details>
+</article>
+<article class="concept" id="c-dataclass">
+<h3><span class="num">5.4</span>@dataclass</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Um atalho que escreve o <code>__init__</code> para classes que só guardam dados.</p>
+<p class="analogy"><span class="tag">Analogia</span> Uma ficha pré-impressa: você só preenche os campos.</p>
+<pre><code data-lang="py">from dataclasses import dataclass
+
+@dataclass(frozen=True)
+class Point:
+    x: int
+    y: int
+
+p = Point(1, 2)
+print(p, p.x)</code></pre>
+<div class="out"><div class="lbl">Saída</div><pre>Point(x=1, y=2) 1</pre></div>
+<p class="where"><span class="tag">No projeto</span> <code>MazeConfig</code> (<code>frozen=True</code>: imutável, depois de validada não muda) e <code>ViewState</code> (mutável: o menu altera cores e o estado do caminho).</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Mudar um campo de uma dataclass <code>frozen</code> dá <code>FrozenInstanceError</code>.</p>
+<details class="quiz"><summary>Teste rápido: Para que serve <code>frozen=True</code>?</summary><p>Impede alterar os campos depois de criado, garantindo que a config validada não é modificada por engano.</p></details>
+</article>
+<article class="concept" id="c-privado">
+<h3><span class="num">5.5</span>Nomes "privados" (_nome)</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Um nome começando com <code>_</code> avisa: "é detalhe interno, não use de fora".</p>
+<p class="analogy"><span class="tag">Analogia</span> A porta "somente funcionários" de um restaurante: ninguém impede o cliente de abrir, mas ele não deve.</p>
+<pre><code data-lang="py">class Safe:
+    def __init__(self):
+        self._code = 1234        # interno
+
+    def check(self, guess):
+        return guess == self._code
+
+print(Safe().check(1234))</code></pre>
+<div class="out"><div class="lbl">Saída</div><pre>True</pre></div>
+<p class="where"><span class="tag">No projeto</span> <code>_open</code>, <code>_close</code>, <code>_carve_dfs</code>, <code>_braid</code> em <code>MazeGenerator</code>. A parte pública (<code>generate</code>, <code>solve</code>, <code>grid</code>...) é o que o outro projeto deve usar.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Usar <code>_nome</code> de fora: se a implementação mudar, seu código quebra.</p>
+<details class="quiz"><summary>Teste rápido: Por que separar parte pública e interna?</summary><p>Para poder melhorar o interior (trocar o algoritmo, por exemplo) sem quebrar quem usa a classe.</p></details>
+</article>
+<article class="concept" id="c-property">
+<h3><span class="num">5.6</span>@property</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Faz um método se comportar como atributo: sem parênteses.</p>
+<p class="analogy"><span class="tag">Analogia</span> O mostrador do carro: parece um dado, mas é calculado na hora.</p>
+<pre><code data-lang="py">class Maze:
+    def __init__(self, cells):
+        self.cells = cells
+
+    @property
+    def has_pattern(self):
+        return bool(self.cells)
+
+print(Maze(set()).has_pattern, Maze({(1, 1)}).has_pattern)</code></pre>
+<div class="out"><div class="lbl">Saída</div><pre>False True</pre></div>
+<p class="where"><span class="tag">No projeto</span> <code>MazeGenerator.has_pattern</code>: <code>a_maze_ing.py</code> usa <code>if not maze.has_pattern</code> para avisar que o labirinto é pequeno demais para o "42".</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Escrever <code>maze.has_pattern()</code> com parênteses: <code>TypeError</code>, pois já é um valor (<code>bool</code>).</p>
+<details class="quiz"><summary>Teste rápido: Qual a vantagem do <code>@property</code>?</summary><p>Quem usa lê <code>obj.valor</code> sem saber se foi guardado ou calculado na hora.</p></details>
+</article></section>
+<section class="module" id="m6"><h2><span class="mod-num">Módulo 6.</span> Quando algo dá errado</h2><p class="module-intro">Na avaliação, <strong>qualquer crash vale nota zero</strong>. Aqui está como o programa lida com entradas ruins sem quebrar.</p><article class="concept" id="c-excecoes">
+<h3><span class="num">6.1</span>Exceções e tracebacks</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Quando algo dá errado, o Python "levanta" uma exceção e, se ninguém tratar, o programa para.</p>
+<p class="analogy"><span class="tag">Analogia</span> Um alarme de incêndio: toca para avisar. Se ninguém responde, evacuam o prédio (o programa fecha).</p>
+<pre><code data-lang="py">numbers = [1, 2]
+print(numbers[5])    # IndexError: list index out of range</code></pre>
+<p class="where"><span class="tag">No projeto</span> As mensagens longas que aparecem num crash são <em>tracebacks</em>: leia de baixo para cima; a última linha diz o tipo do erro, as de cima mostram o caminho até ele.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Entrar em pânico com o traceback. Ele aponta o arquivo e a linha do problema.</p>
+<details class="quiz"><summary>Teste rápido: Em qual direção se lê um traceback?</summary><p>De baixo para cima: o erro está na última linha.</p></details>
+</article>
+<article class="concept" id="c-try-except">
+<h3><span class="num">6.2</span>try / except</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Tenta executar algo e, se der um erro específico, executa um plano B em vez de parar.</p>
+<p class="analogy"><span class="tag">Analogia</span> "Tente abrir a porta; se estiver trancada, use a janela".</p>
+<pre><code data-lang="py">try:
+    n = int(&quot;abc&quot;)
+except ValueError:
+    print(&quot;não é um número&quot;)
+print(&quot;o programa continua&quot;)</code></pre>
+<div class="out"><div class="lbl">Saída</div><pre>não é um número
+o programa continua</pre></div>
+<p class="where"><span class="tag">No projeto</span> <code>load_config</code> captura <code>FileNotFoundError</code> e <code>UnicodeDecodeError</code>; <code>main</code> tem uma rede de segurança final.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Escrever <code>except:</code> sem tipo: engole até erros de programação. Capture o erro <em>específico</em>; <code>except Exception</code> só como última rede.</p>
+<details class="quiz"><summary>Teste rápido: O que acontece com <code>int("abc")</code> sem <code>try</code>?</summary><p>Levanta <code>ValueError</code> e o programa para com traceback.</p></details>
+</article>
+<article class="concept" id="c-raise">
+<h3><span class="num">6.3</span>raise e exceções próprias</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> <code>raise</code> levanta um erro de propósito; podemos criar tipos de erro com nome claro.</p>
+<p class="analogy"><span class="tag">Analogia</span> Apertar você mesmo o botão do alarme quando vê um problema, dizendo exatamente qual.</p>
+<pre><code data-lang="py">class ConfigError(Exception):
+    &quot;&quot;&quot;Configuração inválida.&quot;&quot;&quot;
+
+def check_width(w):
+    if w &lt; 1:
+        raise ConfigError(f&quot;WIDTH deve ser &gt;= 1, recebi {w}&quot;)
+
+try:
+    check_width(0)
+except ConfigError as error:
+    print(&quot;Erro:&quot;, error)</code></pre>
+<div class="out"><div class="lbl">Saída</div><pre>Erro: WIDTH deve ser &gt;= 1, recebi 0</pre></div>
+<p class="where"><span class="tag">No projeto</span> <code>ConfigError</code> em <code>app/config.py</code>; <code>a_maze_ing.run</code> captura <code>(ConfigError, ValueError)</code>, mostra <code>Error: ...</code> e devolve 1.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Mensagens vagas ("erro!"). Diga qual campo, qual valor e o que era esperado.</p>
+<details class="quiz"><summary>Teste rápido: Por que criar <code>ConfigError</code> em vez de usar <code>Exception</code>?</summary><p>Para capturar exatamente os erros de configuração e tratá-los de forma diferente de bugs inesperados.</p></details>
+</article>
+<article class="concept" id="c-with">
+<h3><span class="num">6.4</span>with (gerenciador de contexto)</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Abre algo (um arquivo) e garante que será fechado ao sair do bloco, mesmo se houver erro.</p>
+<p class="analogy"><span class="tag">Analogia</span> Uma porta automática que sempre fecha atrás de você.</p>
+<pre><code data-lang="py">import tempfile, os
+
+path = os.path.join(tempfile.gettempdir(), &quot;demo_estudo.txt&quot;)
+with open(path, &quot;w&quot;) as f:
+    f.write(&quot;olá\n&quot;)
+# aqui o arquivo já foi fechado automaticamente
+with open(path) as f:
+    print(f.read().strip())
+os.remove(path)</code></pre>
+<div class="out"><div class="lbl">Saída</div><pre>olá</pre></div>
+<p class="where"><span class="tag">No projeto</span> <code>write_output</code> e <code>load_config</code> abrem arquivos com <code>with</code>: a regra do projeto é não vazar recursos.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Abrir com <code>open()</code> sem fechar (<code>close()</code>): o arquivo pode ficar incompleto ou preso.</p>
+<details class="quiz"><summary>Teste rápido: O arquivo fecha se ocorrer erro dentro do <code>with</code>?</summary><p>Sim, esse é o ponto: o fechamento é garantido.</p></details>
+</article>
+<article class="concept" id="c-stderr">
+<h3><span class="num">6.5</span>stdout × stderr</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> O programa tem dois canais de saída: o normal (stdout) e o de erros (stderr).</p>
+<p class="analogy"><span class="tag">Analogia</span> Dois alto-falantes: um para o conteúdo, outro só para avisos e problemas.</p>
+<pre><code data-lang="py">import sys
+
+print(&quot;resultado normal&quot;)
+print(&quot;Error: algo deu errado&quot;, file=sys.stderr)</code></pre>
+<p class="where"><span class="tag">No projeto</span> As mensagens <code>Error: ...</code> e os avisos vão para stderr; assim, redirecionar a saída normal para um arquivo não mistura problemas com resultados.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Imprimir erros no canal normal: ficam misturados com a saída útil.</p>
+<details class="quiz"><summary>Teste rápido: Como mandar um <code>print</code> para o stderr?</summary><p><code>print(..., file=sys.stderr)</code>.</p></details>
+</article>
+<article class="concept" id="c-defensiva">
+<h3><span class="num">6.6</span>Programação defensiva</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Assumir que qualquer entrada do usuário pode estar errada e verificar antes de usar.</p>
+<p class="analogy"><span class="tag">Analogia</span> Olhar para os dois lados antes de atravessar a rua, mesmo com o sinal verde.</p>
+<pre><code data-lang="py">def parse_bool(value):
+    lowered = value.lower()
+    if lowered not in (&quot;true&quot;, &quot;false&quot;):
+        raise ValueError(f&quot;PERFECT deve ser True ou False: &#x27;{value}&#x27;&quot;)
+    return lowered == &quot;true&quot;
+
+print(parse_bool(&quot;TRUE&quot;), parse_bool(&quot;false&quot;))</code></pre>
+<div class="out"><div class="lbl">Saída</div><pre>True False</pre></div>
+<p class="where"><span class="tag">No projeto</span> O arquivo de configuração é a entrada "hostil": chave faltando, linha sem <code>=</code>, letras no lugar de números, booleano inválido, coordenadas mal formadas. Cada caso tem teste em <code>tests/test_config.py</code> e gera mensagem, nunca traceback.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Testar só o "caminho feliz". A avaliação edita o config de propósito para tentar quebrar o programa.</p>
+<details class="quiz"><summary>Teste rápido: Cite 3 coisas que o usuário pode fazer de errado neste projeto.</summary><p>Apagar uma chave do config, escrever <code>WIDTH=abc</code>, passar um arquivo inexistente, pressionar Ctrl+C ou Ctrl+D, dar um OUTPUT_FILE numa pasta que não existe...</p></details>
+</article>
+<article class="concept" id="c-regex">
+<h3><span class="num">6.7</span>Expressões regulares (o essencial)</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Um "molde" de texto para verificar se uma string tem certo formato.</p>
+<p class="analogy"><span class="tag">Analogia</span> O gabarito de um formulário: "três números, um traço, dois números".</p>
+<pre><code data-lang="py">import re
+
+INT = re.compile(r&quot;-?[0-9]+&quot;)        # sinal opcional + dígitos
+print(bool(INT.fullmatch(&quot;20&quot;)), bool(INT.fullmatch(&quot;2x&quot;)),
+      bool(INT.fullmatch(&quot;-5&quot;)))</code></pre>
+<div class="out"><div class="lbl">Saída</div><pre>True False True</pre></div>
+<p class="where"><span class="tag">No projeto</span> <code>_INT</code> e <code>_PAIR</code> em <code>app/config.py</code> validam inteiros e pares <code>x,y</code>. Evitam o truque do <code>int()</code>, que aceita coisas como <code>"1_0"</code>.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Usar <code>match</code> quando se queria <code>fullmatch</code>: <code>"2x"</code> casaria só o começo.</p>
+<details class="quiz"><summary>Teste rápido: Por que <code>fullmatch</code> e não <code>match</code>?</summary><p><code>fullmatch</code> exige que o texto <em>inteiro</em> siga o molde.</p></details>
+</article></section>
+<section class="module" id="m7"><h2><span class="mod-num">Módulo 7.</span> Código de qualidade</h2><p class="module-intro">O enunciado exige tipos, documentação, estilo e testes. Estas ferramentas pegam erros antes de o usuário pegar.</p><article class="concept" id="c-type-hints">
+<h3><span class="num">7.1</span>Type hints (dicas de tipo)</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Anotações que dizem que tipo de valor cada parâmetro e retorno espera.</p>
+<p class="analogy"><span class="tag">Analogia</span> Etiquetas nas gavetas: "só meias aqui". Quem usa sabe o que colocar e o que vai sair.</p>
+<pre><code data-lang="py">def area(width: int, height: int) -&gt; int:
+    return width * height
+
+coords: tuple[int, int] = (3, 4)
+seed: int | None = None          # um inteiro OU nada
+grid: list[list[int]] = [[15, 15], [15, 15]]
+print(area(2, 3), coords, seed, grid)</code></pre>
+<div class="out"><div class="lbl">Saída</div><pre>6 (3, 4) None [[15, 15], [15, 15]]</pre></div>
+<p class="where"><span class="tag">No projeto</span> Todo o projeto: <code>def generate(self, seed: int | None = None, on_step: Callable[[], None] | None = None) -> None</code>.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Achar que o Python verifica os tipos ao rodar: ele <em>não</em> verifica. Quem verifica é o <code>mypy</code>.</p>
+<details class="quiz"><summary>Teste rápido: O que significa <code>int | None</code>?</summary><p>O valor pode ser um inteiro ou <code>None</code> (ausente).</p></details>
+</article>
+<article class="concept" id="c-mypy">
+<h3><span class="num">7.2</span>mypy</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Um programa que lê seu código e aponta incoerências de tipos sem executá-lo.</p>
+<p class="analogy"><span class="tag">Analogia</span> Um revisor que lê o texto e avisa "aqui você disse que era número, mas passou texto".</p>
+<pre><code data-lang="py">def double(n: int) -&gt; int:
+    return n * 2
+
+# double(&quot;a&quot;)   -&gt; mypy: Argument 1 to &quot;double&quot; has incompatible type
+#                  &quot;str&quot;; expected &quot;int&quot;
+print(double(4))</code></pre>
+<div class="out"><div class="lbl">Saída</div><pre>8</pre></div>
+<p class="where"><span class="tag">No projeto</span> <code>make lint</code> roda <code>mypy . --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs</code>; <code>make lint-strict</code> usa <code>--strict</code>.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Silenciar erro com <code># type: ignore</code> em vez de corrigir; a flag <code>--warn-unused-ignores</code> reclama quando o silenciamento é desnecessário.</p>
+<details class="quiz"><summary>Teste rápido: O mypy executa o programa?</summary><p>Não: ele só analisa o texto do código.</p></details>
+</article>
+<article class="concept" id="c-docstrings">
+<h3><span class="num">7.3</span>Docstrings (PEP 257)</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Um texto entre <code>"""</code> logo abaixo de uma função, classe ou módulo, explicando o que ele faz.</p>
+<p class="analogy"><span class="tag">Analogia</span> O manual de instruções que vem na caixa do aparelho.</p>
+<pre><code data-lang="py">def area(width, height):
+    &quot;&quot;&quot;Return the area of a rectangle.
+
+    Args:
+        width: Number of columns.
+        height: Number of rows.
+
+    Returns:
+        The number of cells.
+    &quot;&quot;&quot;
+    return width * height
+
+print(area.__doc__.splitlines()[0])</code></pre>
+<div class="out"><div class="lbl">Saída</div><pre>Return the area of a rectangle.</pre></div>
+<p class="where"><span class="tag">No projeto</span> Toda função e classe do projeto, no estilo Google (<code>Args:</code>, <code>Returns:</code>, <code>Raises:</code>).</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Docstring que repete o nome da função ("calcula a área") sem dizer nada novo. Explique parâmetros e o que devolve.</p>
+<details class="quiz"><summary>Teste rápido: Como acessar a docstring de uma função?</summary><p>Com <code>funcao.__doc__</code> ou <code>help(funcao)</code>.</p></details>
+</article>
+<article class="concept" id="c-flake8">
+<h3><span class="num">7.4</span>flake8 e PEP 8</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> PEP 8 é o guia de estilo do Python; o <code>flake8</code> confere se o código o segue.</p>
+<p class="analogy"><span class="tag">Analogia</span> A revisão ortográfica de um editor de texto: não muda o sentido, mas padroniza.</p>
+<pre><code data-lang="sh"># Regras que o flake8 cobra:
+#  - linhas com no máximo 79 caracteres   (E501)
+#  - 4 espaços de recuo                   (E111)
+#  - nomes_em_snake_case para funções     (N802, se o plugin existir)
+#  - sem imports ou variáveis sem uso     (F401, F841)
+#  - sem espaços sobrando no fim da linha (W291)</code></pre>
+<p class="where"><span class="tag">No projeto</span> <code>make lint</code> roda <code>flake8 .</code>; o arquivo <code>.flake8</code> ignora <code>.venv</code> e <code>build</code>.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Ignorar o aviso de "import não usado": a avaliação diz que a norma tem de passar.</p>
+<details class="quiz"><summary>Teste rápido: Qual o tamanho máximo da linha pela PEP 8?</summary><p>79 caracteres.</p></details>
+</article>
+<article class="concept" id="c-pytest">
+<h3><span class="num">7.5</span>Testes com pytest</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Funções que verificam automaticamente se o código faz o esperado.</p>
+<p class="analogy"><span class="tag">Analogia</span> Uma lista de conferência antes da decolagem: roda sempre igual, cada item dá ✔ ou ✘.</p>
+<pre><code data-lang="py">def soma(a, b):
+    return a + b
+
+def test_soma():
+    assert soma(2, 3) == 5       # se for falso, o teste falha
+
+test_soma()
+print(&quot;passou&quot;)</code></pre>
+<div class="out"><div class="lbl">Saída</div><pre>passou</pre></div>
+<p class="where"><span class="tag">No projeto</span> <code>tests/</code>: coerência das paredes, conectividade, ausência de áreas 3x3, mesma seed = mesmo labirinto, erros de configuração, menu. Rode com <code>make test</code>.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Nome da função de teste sem o prefixo <code>test_</code>: o pytest não encontra.</p>
+<details class="quiz"><summary>Teste rápido: O que o <code>assert</code> faz?</summary><p>Falha (levanta erro) se a condição for falsa.</p></details>
+</article>
+<article class="concept" id="c-testar-muitos">
+<h3><span class="num">7.6</span>Testar muitas entradas</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Um mesmo teste rodado com várias sementes, tamanhos e modos para cobrir casos de borda.</p>
+<p class="analogy"><span class="tag">Analogia</span> Testar uma porta abrindo-a de vários ângulos, não só de frente.</p>
+<pre><code data-lang="py">for seed in range(3):
+    for size in [(2, 1), (9, 7), (20, 15)]:
+        print(seed, size)</code></pre>
+<p class="where"><span class="tag">No projeto</span> <code>@pytest.mark.parametrize</code> em <code>tests/test_generator.py</code> combina 3 algoritmos x 2 modos x 10 tamanhos x 15 seeds. Os mínimos (2x1, 3x3) e os limites do "42" (9x7, 8x8) são os casos de borda.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Testar só 20x15: bugs aparecem nos tamanhos pequenos e nos ímpares/pares.</p>
+<details class="quiz"><summary>Teste rápido: Por que testar tamanhos pares e ímpares?</summary><p>Porque o centro e o espaço do "42" mudam (1 coluna central ou 2).</p></details>
+</article></section>
+<section class="module" id="m8"><h2><span class="mod-num">Módulo 8.</span> Números por dentro</h2><p class="module-intro">O arquivo de saída guarda as paredes de cada célula em <strong>um dígito hexadecimal</strong>. Para entendê-lo é preciso entender bits.</p><article class="concept" id="c-binario">
+<h3><span class="num">8.1</span>Binário</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Contar usando só 0 e 1.</p>
+<p class="analogy"><span class="tag">Analogia</span> Uma fileira de interruptores: cada um só liga ou desliga. Com 4 interruptores há 16 combinações.</p>
+<pre><code data-lang="py">print(bin(10))              # 10 escrito em binário
+print(int(&quot;1010&quot;, 2))       # de volta para decimal
+print(format(10, &quot;04b&quot;))    # com 4 dígitos</code></pre>
+<div class="out"><div class="lbl">Saída</div><pre>0b1010
+10
+1010</pre></div>
+<p class="where"><span class="tag">No projeto</span> Cada célula tem 4 paredes = 4 interruptores = 4 bits.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Ler da esquerda para a direita como se o primeiro dígito fosse o menor: o dígito mais à direita é o <strong>bit 0</strong>.</p>
+<details class="quiz"><summary>Teste rápido: Quanto é <code>0b101</code> em decimal?</summary><p>5 (4 + 0 + 1).</p></details>
+</article>
+<article class="concept" id="c-hexadecimal">
+<h3><span class="num">8.2</span>Hexadecimal</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Contar com 16 símbolos: 0-9 e A-F (A=10, ..., F=15). Um dígito hex = exatamente 4 bits.</p>
+<p class="analogy"><span class="tag">Analogia</span> Uma abreviação: em vez de escrever "1010" você escreve "A".</p>
+<pre><code data-lang="py">print(format(10, &quot;X&quot;))      # 10 -&gt; &#x27;A&#x27;
+print(0xF)                  # F -&gt; 15
+print(int(&quot;B&quot;, 16))         # &#x27;B&#x27; -&gt; 11
+print(format(15, &quot;04b&quot;))    # F = 1111</code></pre>
+<div class="out"><div class="lbl">Saída</div><pre>A
+15
+11
+1111</pre></div>
+<p class="where"><span class="tag">No projeto</span> <code>format_maze</code>: <code>"".join(format(cell, "X") for cell in row)</code>. Uma célula = um caractere de <code>0</code> a <code>F</code>.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Usar minúsculas (<code>a</code>) quando o formato pede maiúsculas; use <code>"X"</code>.</p>
+<details class="quiz"><summary>Teste rápido: O que significa a célula <code>F</code>?</summary><p>1111: as quatro paredes fechadas (uma célula totalmente fechada, como as do "42").</p></details>
+</article>
+<article class="concept" id="c-flags">
+<h3><span class="num">8.3</span>Bits como interruptores (flags)</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Cada parede ocupa um bit; ligado = parede fechada.</p>
+<p class="analogy"><span class="tag">Analogia</span> Quatro lâmpadas: Norte, Leste, Sul, Oeste. Acesa quer dizer "tem parede".</p>
+<pre><code data-lang="py">NORTH, EAST, SOUTH, WEST = 1, 2, 4, 8     # 0001 0010 0100 1000
+cell = NORTH + SOUTH                      # paredes norte e sul
+print(cell, format(cell, &quot;04b&quot;), format(cell, &quot;X&quot;))</code></pre>
+<div class="out"><div class="lbl">Saída</div><pre>5 0101 5</pre></div>
+<p class="where"><span class="tag">No projeto</span> <code>mazegen/generator.py</code> define <code>NORTH = 1, EAST = 2, SOUTH = 4, WEST = 8</code> (potências de 2: cada uma usa um bit diferente).</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Inverter o significado: bit <strong>1 = fechada</strong>. O exemplo do enunciado, <code>3</code> = 0011, quer dizer norte e leste fechadas, e sul e oeste abertas.</p>
+<details class="quiz"><summary>Teste rápido: Qual dígito hex é uma célula só com a parede oeste fechada?</summary><p><code>8</code> (1000).</p></details>
+</article>
+<article class="concept" id="c-bitwise">
+<h3><span class="num">8.4</span>Operadores de bits: & | ~</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> <code>&</code> testa um bit, <code>|</code> liga, <code>&= ~</code> desliga.</p>
+<p class="analogy"><span class="tag">Analogia</span> Mexer num interruptor específico sem tocar nos outros três.</p>
+<pre><code data-lang="py">NORTH, EAST, SOUTH, WEST = 1, 2, 4, 8
+cell = 15                          # 1111: todas fechadas
+cell &amp;= ~EAST                      # abre o leste -&gt; 1101
+print(cell, bool(cell &amp; EAST), bool(cell &amp; NORTH))
+cell |= EAST                       # fecha o leste de novo
+print(cell)</code></pre>
+<div class="out"><div class="lbl">Saída</div><pre>13 False True
+15</pre></div>
+<p class="where"><span class="tag">No projeto</span> <code>_open</code> faz <code>self.grid[y][x] &= ~direction</code>; <code>_close</code> faz <code>|= direction</code>; testes como <code>if cell & EAST</code> perguntam "o leste está fechado?".</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Confundir <code>&</code> (bit a bit) com <code>and</code> (lógico). Para checar uma parede use <code>&</code>.</p>
+<details class="quiz"><summary>Teste rápido: A célula <code>A</code> (1010): que paredes estão fechadas?</summary><p>Leste (2) e oeste (8): é um corredor vertical, aberto ao norte e ao sul.</p></details>
+</article>
+<article class="concept" id="c-widget-decoder">
+<h3><span class="num">8.5</span>Experimente: decodificador de célula</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Clique nas paredes e veja o número mudar.</p>
+<p class="analogy"><span class="tag">Analogia</span> É o painel de quatro interruptores do tópico anterior.</p>
+<div class="widget" data-widget="decoder"></div>
+<p class="where"><span class="tag">No projeto</span> É exatamente a conta de <code>format(cell, "X")</code>.</p>
+<details class="quiz"><summary>Teste rápido: Como fica a célula <code>6</code>?</summary><p>6 = 4 + 2: parede sul e leste fechadas; norte e oeste abertas.</p></details>
+</article>
+<article class="concept" id="c-parede-compartilhada">
+<h3><span class="num">8.6</span>Paredes compartilhadas e coerência</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Uma parede entre duas células pertence às duas: precisa estar igual nas duas.</p>
+<p class="analogy"><span class="tag">Analogia</span> A parede entre dois quartos: se um lado diz "tem parede", o outro não pode dizer "é porta".</p>
+<pre><code data-lang="py">NORTH, EAST, SOUTH, WEST = 1, 2, 4, 8
+a, b = 15, 15              # duas células vizinhas, a à esquerda de b
+a &amp;= ~EAST                 # abre o leste de a ...
+b &amp;= ~WEST                 # ... e o oeste de b
+print(a, b)</code></pre>
+<div class="out"><div class="lbl">Saída</div><pre>13 7</pre></div>
+<p class="where"><span class="tag">No projeto</span> <code>MazeGenerator._open</code> sempre mexe nas <em>duas</em> células. Assim a regra ("sem um leste fechado ao lado de um oeste aberto") é obedecida por construção. O teste <code>walls_coherent</code> confere.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Abrir só um dos lados: o validador acusa incoerência.</p>
+<details class="quiz"><summary>Teste rápido: Por que <code>_open</code> altera duas células?</summary><p>Para a parede compartilhada ficar igual nas duas, como o enunciado exige.</p></details>
+</article></section>
+<section class="module" id="m9"><h2><span class="mod-num">Módulo 9.</span> O labirinto como grafo</h2><p class="module-intro">A matemática por trás do labirinto: grades, grafos e árvores.</p><article class="concept" id="c-coordenadas">
+<h3><span class="num">9.1</span>Grade e coordenadas</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> A posição é <code>(x, y)</code>: x = coluna, y = linha. A origem é o canto superior esquerdo e o <strong>y cresce para baixo</strong>.</p>
+<p class="analogy"><span class="tag">Analogia</span> Como as linhas de um texto: a linha 0 é a de cima, e descer é aumentar o número.</p>
+<pre><code data-lang="py">DELTAS = {&quot;N&quot;: (0, -1), &quot;E&quot;: (1, 0), &quot;S&quot;: (0, 1), &quot;W&quot;: (-1, 0)}
+x, y = 2, 3
+dx, dy = DELTAS[&quot;S&quot;]            # ir para o sul
+print(x + dx, y + dy)</code></pre>
+<div class="out"><div class="lbl">Saída</div><pre>2 4</pre></div>
+<p class="where"><span class="tag">No projeto</span> <code>_DELTAS</code> em <code>mazegen/generator.py</code>. <code>ENTRY=0,0</code> é o canto superior esquerdo.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Achar que norte aumenta y (como no gráfico de matemática). Aqui norte é <code>(0, -1)</code>.</p>
+<details class="quiz"><summary>Teste rápido: De <code>(5, 5)</code>, para onde vai o movimento Oeste?</summary><p>Para <code>(4, 5)</code>.</p></details>
+</article>
+<article class="concept" id="c-vizinhos">
+<h3><span class="num">9.2</span>Vizinhos e limites</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Os vizinhos de uma célula são as 4 células ao redor, desde que estejam dentro da grade.</p>
+<p class="analogy"><span class="tag">Analogia</span> Numa mesa de xadrez, uma peça na borda não pode andar para fora do tabuleiro.</p>
+<pre><code data-lang="py">width, height = 3, 2
+
+def in_bounds(x, y):
+    return 0 &lt;= x &lt; width and 0 &lt;= y &lt; height
+
+print(in_bounds(2, 1), in_bounds(3, 1), in_bounds(-1, 0))</code></pre>
+<div class="out"><div class="lbl">Saída</div><pre>True False False</pre></div>
+<p class="where"><span class="tag">No projeto</span> <code>_in_bounds</code>, <code>_is_free</code> (dentro e fora do "42") e <code>_free_neighbours</code>.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Usar <code><=</code> no limite superior: o último índice é <code>width - 1</code>.</p>
+<details class="quiz"><summary>Teste rápido: Numa grade com largura 3, qual o maior x válido?</summary><p>2 (índices 0, 1 e 2).</p></details>
+</article>
+<article class="concept" id="c-grafo">
+<h3><span class="num">9.3</span>Grafo: nós e arestas</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Um conjunto de pontos (nós) ligados por linhas (arestas).</p>
+<p class="analogy"><span class="tag">Analogia</span> Um mapa de metrô: estações são nós, trilhos são arestas.</p>
+<pre><code data-lang="py"># cada célula é um nó; cada parede aberta é uma aresta
+graph = {
+    &quot;A&quot;: [&quot;B&quot;],
+    &quot;B&quot;: [&quot;A&quot;, &quot;C&quot;],
+    &quot;C&quot;: [&quot;B&quot;],
+}
+print(graph[&quot;B&quot;])</code></pre>
+<div class="out"><div class="lbl">Saída</div><pre>[&#x27;A&#x27;, &#x27;C&#x27;]</pre></div>
+<p class="where"><span class="tag">No projeto</span> No labirinto, as células são nós e as passagens abertas são arestas. A busca por caminhos (BFS) e a geração (DFS) são algoritmos de grafos.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Pensar que as paredes fechadas são arestas: a aresta é a <em>passagem</em>.</p>
+<details class="quiz"><summary>Teste rápido: Se há uma parede entre duas células, existe aresta entre elas?</summary><p>Não: só há aresta onde a parede está aberta.</p></details>
+</article>
+<article class="concept" id="c-arvore">
+<h3><span class="num">9.4</span>Árvore, ciclo e labirinto perfeito</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Uma árvore é um grafo conectado sem ciclos; um labirinto perfeito é uma árvore geradora.</p>
+<p class="analogy"><span class="tag">Analogia</span> Uma árvore de verdade: dos galhos até o tronco só existe um caminho. Um ciclo seria um galho que dá a volta e gruda de novo.</p>
+<pre><code data-lang="py">cells = 300                     # 20 x 15, sem o &quot;42&quot;
+passages_perfect = cells - 1    # numa árvore: nós - 1 arestas
+print(passages_perfect)
+print(passages_perfect - cells + 1)   # laços = arestas - nós + 1</code></pre>
+<div class="out"><div class="lbl">Saída</div><pre>299
+0</pre></div>
+<p class="where"><span class="tag">No projeto</span> <code>MazeGenerator.loop_count()</code> calcula <code>passagens - células + 1</code>: 0 num perfeito, e vários no modo jogável (o enunciado exige pelo menos 2).</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Achar que "perfeito" quer dizer "bonito": quer dizer que existe <strong>exatamente um caminho</strong> entre quaisquer duas células.</p>
+<details class="quiz"><summary>Teste rápido: Por que num labirinto perfeito não há área aberta 3x3?</summary><p>Uma área aberta tem ciclos, e uma árvore não tem ciclos.</p></details>
+</article>
+<article class="concept" id="c-beco">
+<h3><span class="num">9.5</span>Beco sem saída (dead end)</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Uma célula com uma única abertura: quem entra tem de voltar.</p>
+<p class="analogy"><span class="tag">Analogia</span> Uma rua sem saída.</p>
+<pre><code data-lang="py">cell = 7                       # 0111 -&gt; norte, leste, sul fechadas
+walls = bin(cell).count(&quot;1&quot;)    # conta os bits ligados
+print(walls, walls == 3)</code></pre>
+<div class="out"><div class="lbl">Saída</div><pre>3 True</pre></div>
+<p class="where"><span class="tag">No projeto</span> <code>MazeGenerator.dead_ends()</code>: <code>bin(cell).count("1") == 3</code>. No modo jogável o objetivo é não ter nenhum. Os únicos que restam são os "bolsões" do 2 do "42", sem vizinho livre para abrir.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Contar também as células do "42": elas têm 4 paredes (0 aberturas) e não são becos.</p>
+<details class="quiz"><summary>Teste rápido: Quantas paredes tem um beco sem saída?</summary><p>Três (uma abertura).</p></details>
+</article>
+<article class="concept" id="c-area-3x3">
+<h3><span class="num">9.6</span>Área aberta 3x3</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Um quadrado de 3x3 células sem nenhuma parede entre elas: proibido.</p>
+<p class="analogy"><span class="tag">Analogia</span> Um salão onde deveria haver um corredor.</p>
+<pre><code data-lang="py"># janela 3x3: 12 divisas internas, todas abertas = salão
+inner_walls = 2 * 3 * 2          # 3 linhas x 2 + 3 colunas x 2
+print(inner_walls)</code></pre>
+<div class="out"><div class="lbl">Saída</div><pre>12</pre></div>
+<p class="where"><span class="tag">No projeto</span> <code>_window_open(left, top)</code> testa uma janela; <code>_open_block_near(x, y)</code> testa as 9 janelas que contêm a célula. O braiding desfaz qualquer abertura que crie um bloco.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Testar só 2x2: o enunciado permite 2x3 e 3x2, e proíbe só o 3x3.</p>
+<details class="quiz"><summary>Teste rápido: 2x3 é permitido?</summary><p>Sim. Só 3x3 ou maior é proibido.</p></details>
+</article>
+<article class="concept" id="c-padrao-42">
+<h3><span class="num">9.7</span>O padrão "42"</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Células totalmente fechadas desenhando o 4 e o 2 no meio do labirinto.</p>
+<p class="analogy"><span class="tag">Analogia</span> Um carimbo no meio do mapa: a estrada passa ao redor.</p>
+<pre><code data-lang="py">FOUR = (&quot;X..&quot;, &quot;X..&quot;, &quot;XXX&quot;, &quot;..X&quot;, &quot;..X&quot;)
+TWO  = (&quot;XXX&quot;, &quot;..X&quot;, &quot;XXX&quot;, &quot;X..&quot;, &quot;XXX&quot;)
+for a, b in zip(FOUR, TWO):
+    print(a + &quot; &quot; + b)</code></pre>
+<div class="out"><div class="lbl">Saída</div><pre>X.. XXX
+X.. ..X
+XXX XXX
+..X X..
+..X XXX</pre></div>
+<p class="where"><span class="tag">No projeto</span> <code>mazegen/pattern.py</code>: cada letra <code>X</code> é uma célula fechada (valor <code>F</code>). O espaço entre os dígitos tem 1 coluna (largura ímpar) ou 2 (par), para que o centro do labirinto fique sempre aberto. Se não cabe (menos de 9x7), é omitido e o programa avisa.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Esquecer de pular as células do "42" na geração: seriam abertas pelo algoritmo.</p>
+<details class="quiz"><summary>Teste rápido: Por que entrada e saída não podem ficar dentro do "42"?</summary><p>Porque essas células são totalmente fechadas e ficariam inalcançáveis.</p></details>
+</article></section>
+<section class="module" id="m10"><h2><span class="mod-num">Módulo 10.</span> Algoritmos</h2><p class="module-intro">Como o programa realmente <em>constrói</em> e <em>resolve</em> o labirinto. Cada animação abaixo roda o mesmo algoritmo do código, em miniatura.</p><article class="concept" id="c-aleatoriedade">
+<h3><span class="num">10.1</span>Aleatoriedade e seed</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Computadores geram números "pseudoaleatórios": parecem sorteados, mas saem de uma fórmula que parte da <em>seed</em> (semente).</p>
+<p class="analogy"><span class="tag">Analogia</span> Uma roleta com resultado combinado: mesma semente, mesma sequência de "sorteios".</p>
+<pre><code data-lang="py">import random
+
+a = random.Random(42)
+b = random.Random(42)
+c = random.Random(43)
+print(a.randint(1, 100) == b.randint(1, 100))   # mesma semente
+print(a.randint(1, 100) == c.randint(1, 100))   # (quase certo) diferente</code></pre>
+<div class="out"><div class="lbl">Saída</div><pre>True
+False</pre></div>
+<p class="where"><span class="tag">No projeto</span> <code>generate()</code> cria <code>random.Random(self.seed)</code>: mesmo <code>SEED=42</code> no config gera sempre o mesmo labirinto (exigência do enunciado). Cada regeneração do menu usa uma seed nova e a mostra no cabeçalho.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Usar o <code>random</code> "global": outra parte do programa pode consumir números e quebrar a reprodução. Por isso usamos uma instância própria.</p>
+<details class="quiz"><summary>Teste rápido: Duas execuções com <code>SEED=7</code> dão o mesmo labirinto?</summary><p>Sim, mesmos parâmetros e mesma seed produzem o mesmo labirinto.</p></details>
+</article>
+<article class="concept" id="c-widget-seed">
+<h3><span class="num">10.2</span>Experimente: seed e arquivo de saída</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Mude a seed e veja o labirinto e o texto do arquivo mudarem.</p>
+<p class="analogy"><span class="tag">Analogia</span> A mesma receita, com a mesma semente de sorteio, dá sempre o mesmo bolo.</p>
+<div class="widget" data-widget="seed"></div>
+<p class="where"><span class="tag">No projeto</span> O texto abaixo do desenho é o mesmo formato do arquivo gerado pelo projeto.</p>
+<details class="quiz"><summary>Teste rápido: O que acontece com o arquivo se a seed for a mesma?</summary><p>Fica idêntico, linha por linha.</p></details>
+</article>
+<article class="concept" id="c-pilha-fila">
+<h3><span class="num">10.3</span>Pilha × fila</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Pilha: o último a entrar é o primeiro a sair. Fila: o primeiro a entrar é o primeiro a sair.</p>
+<p class="analogy"><span class="tag">Analogia</span> Pilha de pratos (pega o de cima) × fila do banco (atende o mais antigo).</p>
+<pre><code data-lang="py">from collections import deque
+
+pilha = [1, 2, 3]
+print(pilha.pop())            # sai o ultimo que entrou
+fila = deque([1, 2, 3])
+print(fila.popleft())         # sai o primeiro que entrou</code></pre>
+<div class="out"><div class="lbl">Saída</div><pre>3
+1</pre></div>
+<p class="where"><span class="tag">No projeto</span> O DFS usa uma <strong>pilha</strong> (volta pelo caminho que fez); o BFS usa uma <strong>fila</strong> (explora em ondas).</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Trocar os dois: com fila, o gerador não faria corredores longos; com pilha, o solucionador não acharia o caminho mais curto.</p>
+<details class="quiz"><summary>Teste rápido: Qual estrutura o BFS usa?</summary><p>Uma fila.</p></details>
+</article>
+<article class="concept" id="c-recursao">
+<h3><span class="num">10.4</span>Recursão e o limite de recursão</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Uma função que chama a si mesma. O Python limita isso a cerca de 1000 chamadas empilhadas.</p>
+<p class="analogy"><span class="tag">Analogia</span> Bonecas russas: cada uma contém outra, mas se forem muitas demais a pilha tomba.</p>
+<pre><code data-lang="py">def countdown(n):
+    if n == 0:
+        return &quot;fim&quot;
+    return countdown(n - 1)
+
+print(countdown(100))
+try:
+    countdown(5000)
+except RecursionError:
+    print(&quot;RecursionError: fundo demais&quot;)</code></pre>
+<div class="out"><div class="lbl">Saída</div><pre>fim
+RecursionError: fundo demais</pre></div>
+<p class="where"><span class="tag">No projeto</span> O DFS clássico é recursivo, mas aqui foi feito <em>iterativo, com pilha explícita</em>: um labirinto 200x200 tem 40 000 células e estouraria o limite. O teste <code>test_big_maze_does_not_hit_recursion_limit</code> garante isso.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Usar a versão recursiva: funciona em labirintos pequenos e <strong>quebra</strong> nos grandes (e crash = nota 0).</p>
+<details class="quiz"><summary>Teste rápido: Como evitar estourar o limite de recursão?</summary><p>Trocar a recursão por um laço <code>while</code> com uma pilha própria.</p></details>
+</article>
+<article class="concept" id="c-dfs">
+<h3><span class="num">10.5</span>DFS: o "recursive backtracker"</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Anda por corredores novos até travar; ao travar, volta até achar uma bifurcação ainda inexplorada.</p>
+<p class="analogy"><span class="tag">Analogia</span> Explorar uma caverna com um fio de lã: avança e abre passagens; quando só há paredes, recolhe o fio até um ponto com saída.</p>
+<div class="widget" data-widget="dfs"></div>
+<pre><code data-lang="py"># esqueleto (mazegen/generator.py: _carve_dfs)
+visited = {entry}
+stack = [entry]
+while stack:
+    x, y = stack[-1]                    # célula atual (topo da pilha)
+    options = [n for n in neighbours(x, y) if n not in visited]
+    if not options:
+        stack.pop()                     # beco: volta um passo
+        continue
+    nx, ny, direction = rng.choice(options)
+    open_wall(x, y, direction)          # derruba a parede
+    visited.add((nx, ny))
+    stack.append((nx, ny))              # avança</code></pre>
+<p class="where"><span class="tag">No projeto</span> <code>MazeGenerator._carve_dfs</code>. O resultado é uma árvore geradora: conectada, sem ciclos, corredores longos e tortuosos. É o primeiro passo dos dois modos.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Esquecer de marcar as células do "42" como indisponíveis: o algoritmo as abriria.</p>
+<details class="quiz"><summary>Teste rápido: Quando o DFS faz <code>stack.pop()</code>?</summary><p>Quando a célula atual não tem nenhum vizinho novo: ele volta uma célula.</p></details>
+</article>
+<article class="concept" id="c-prim-kruskal">
+<h3><span class="num">10.6</span>Prim e Kruskal (outros algoritmos)</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Prim cresce a partir de uma "borda" de paredes sorteadas; Kruskal junta ilhas de células com paredes sorteadas, sem formar ciclo.</p>
+<p class="analogy"><span class="tag">Analogia</span> Prim: uma mancha de tinta se espalhando. Kruskal: várias ilhas que vão ganhando pontes até virar um continente só.</p>
+<pre><code data-lang="sh"># Kruskal em uma ideia (usa &quot;union-find&quot; para saber se duas
+# células já estão na mesma ilha):
+#   1) sorteie a ordem de todas as paredes entre células vizinhas
+#   2) para cada parede: se as duas células estão em ilhas
+#      diferentes, derrube a parede e una as ilhas
+#   3) se já estão na mesma ilha, mantenha a parede (evita ciclo)</code></pre>
+<p class="where"><span class="tag">No projeto</span> <code>_carve_prim</code> e <code>_carve_kruskal</code>, escolhidos pela chave <code>ALGORITHM=prim|kruskal</code> do config. Mudam o "jeito" do labirinto (Prim e Kruskal dão corredores curtos e muitas bifurcações); o resto é igual. É um dos bônus.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Em Kruskal, esquecer de checar a ilha e criar ciclos num labirinto que deveria ser perfeito.</p>
+<details class="quiz"><summary>Teste rápido: O que os três algoritmos têm em comum?</summary><p>Todos constroem uma árvore geradora: conectada e sem ciclos.</p></details>
+</article>
+<article class="concept" id="c-bfs">
+<h3><span class="num">10.7</span>BFS: o caminho mais curto</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Explora o labirinto em "ondas", das células mais próximas às mais distantes; a primeira vez que chega ao destino é pelo menor caminho.</p>
+<p class="analogy"><span class="tag">Analogia</span> Uma pedra na água: as ondas se espalham por igual, e a primeira que toca a margem veio pelo trajeto mais curto.</p>
+<div class="widget" data-widget="bfs"></div>
+<pre><code data-lang="py"># esqueleto (mazegen/generator.py: solve_cells)
+parents = {entry: None}
+queue = deque([entry])
+while queue:
+    cell = queue.popleft()               # o mais antigo da fila
+    if cell == exit:
+        break
+    for neighbour in open_neighbours(cell):
+        if neighbour not in parents:     # ainda não visto
+            parents[neighbour] = cell    # &quot;cheguei nele vindo de cell&quot;
+            queue.append(neighbour)
+# reconstrói de trás para frente, do exit até a entry, seguindo parents</code></pre>
+<p class="where"><span class="tag">No projeto</span> <code>MazeGenerator.solve_cells</code> e <code>solve</code> (que converte a lista de células em <code>N/E/S/W</code>). O caminho vai para a 3ª linha de dados do arquivo e para o destaque no menu: os dois vêm do mesmo cálculo, por isso batem.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Usar DFS para resolver: acha <em>um</em> caminho, não necessariamente o mais curto.</p>
+<details class="quiz"><summary>Teste rápido: Para que serve o dicionário <code>parents</code>?</summary><p>Guarda de onde se veio a cada célula, para reconstruir o caminho de trás para frente e para marcar as já vistas.</p></details>
+</article>
+<article class="concept" id="c-braiding">
+<h3><span class="num">10.8</span>Braiding: tirar os becos sem saída</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Trançar o labirinto: para cada beco sem saída, derrubar uma parede para ligá-lo a outro corredor.</p>
+<p class="analogy"><span class="tag">Analogia</span> Abrir uma porta no fundo da rua sem saída, dando uma segunda saída.</p>
+<div class="widget" data-widget="braid"></div>
+<pre><code data-lang="py"># esqueleto (mazegen/generator.py: _braid)
+for cell in dead_ends():                       # em ordem aleatória
+    for neighbour in closed_walls_of(cell):    # prefere outro beco
+        open_wall(cell, neighbour)
+        if creates_3x3_open_area(cell, neighbour):
+            close_wall(cell, neighbour)        # desfaz e tenta outra
+            continue
+        break                                  # deu certo: próximo beco</code></pre>
+<p class="where"><span class="tag">No projeto</span> <code>MazeGenerator._braid</code>, só quando <code>PERFECT=False</code>. Cria laços (rotas alternativas, exigidas pelo modo jogável) sem nunca produzir área 3x3. É também o que dá o bônus "sem becos".</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Abrir paredes sem checar o 3x3: surgem salões, que o enunciado proíbe.</p>
+<details class="quiz"><summary>Teste rápido: Por que o braiding derruba uma parede e <em>depois</em> checa o 3x3, desfazendo se preciso?</summary><p>Porque é simples tentar e conferir o resultado: a checagem olha a grade já com a parede aberta.</p></details>
+</article>
+<article class="concept" id="c-custo">
+<h3><span class="num">10.9</span>Custo: quanto demora?</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Medir como o tempo cresce quando o labirinto cresce (notação O).</p>
+<p class="analogy"><span class="tag">Analogia</span> Pintar uma parede: o dobro da parede dá o dobro do trabalho. Isso é O(n).</p>
+<pre><code data-lang="py">cells = 200 * 200
+print(cells)          # DFS e BFS visitam cada célula umas poucas vezes</code></pre>
+<div class="out"><div class="lbl">Saída</div><pre>40000</pre></div>
+<p class="where"><span class="tag">No projeto</span> DFS, Prim, Kruskal e BFS são proporcionais ao número de células (O(n)). O braiding também, pois cada tentativa olha poucas janelas 3x3. Por isso 200x200 gera em frações de segundo.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Usar <code>lista.pop(0)</code> ou procurar em listas dentro de laços: o custo explode (daí <code>deque</code> e <code>set</code>).</p>
+<details class="quiz"><summary>Teste rápido: Se o labirinto tem 4x mais células, o DFS demora mais ou menos quanto?</summary><p>Cerca de 4x (cresce linearmente).</p></details>
+</article></section>
+<section class="module" id="m11"><h2><span class="mod-num">Módulo 11.</span> Interface no terminal</h2><p class="module-intro">Como o programa conversa com a pessoa: menu, cores e saída limpa.</p><article class="concept" id="c-input-menu">
+<h3><span class="num">11.1</span>input() e o laço do menu</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> <code>input()</code> espera a pessoa digitar e devolve o texto; num <code>while True</code> isso vira um menu.</p>
+<p class="analogy"><span class="tag">Analogia</span> Um atendente que pergunta "o que deseja?", atende e pergunta de novo até você dizer "tchau".</p>
+<pre><code data-lang="py">answers = iter([&quot;2&quot;, &quot;x&quot;, &quot;q&quot;])      # simula o que a pessoa digitaria
+while True:
+    choice = next(answers)
+    if choice == &quot;q&quot;:
+        print(&quot;saindo&quot;)
+        break
+    elif choice == &quot;2&quot;:
+        print(&quot;alternar caminho&quot;)
+    else:
+        print(&quot;opção desconhecida:&quot;, choice)</code></pre>
+<div class="out"><div class="lbl">Saída</div><pre>alternar caminho
+opção desconhecida: x
+saindo</pre></div>
+<p class="where"><span class="tag">No projeto</span> <code>run_menu</code> em <code>app/render.py</code>: 1 regenera, 2 alterna o caminho, 3-5 trocam cores, 6 alterna a animação, q sai. Opção inválida só mostra um aviso.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Esquecer o <code>break</code>/<code>return</code>: o menu nunca termina.</p>
+<details class="quiz"><summary>Teste rápido: O que o programa faz com uma opção desconhecida?</summary><p>Mostra "Unknown choice" e pergunta de novo, sem quebrar.</p></details>
+</article>
+<article class="concept" id="c-ansi">
+<h3><span class="num">11.2</span>Cores com códigos ANSI</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Sequências especiais de texto que o terminal interpreta como "mude a cor".</p>
+<p class="analogy"><span class="tag">Analogia</span> Instruções entre parênteses para o terminal: "(agora fundo vermelho)".</p>
+<pre><code data-lang="py">RESET = &quot;\033[0m&quot;
+tile = f&quot;\033[48;5;196m  {RESET}&quot;      # 2 espaços com fundo vermelho
+print(repr(tile))</code></pre>
+<div class="out"><div class="lbl">Saída</div><pre>&#x27;\x1b[48;5;196m  \x1b[0m&#x27;</pre></div>
+<p class="where"><span class="tag">No projeto</span> <code>_paint(code)</code> em <code>app/render.py</code> desenha cada "ladrilho" do labirinto como 2 espaços com cor de fundo. As cores de parede, do "42" e do caminho são listas de códigos 0-255.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Esquecer o <code>RESET</code>: a cor "vaza" para todo o texto seguinte.</p>
+<details class="quiz"><summary>Teste rápido: Para que serve o <code>\033[0m</code>?</summary><p>Restaura as cores normais do terminal.</p></details>
+</article>
+<article class="concept" id="c-tiles">
+<h3><span class="num">11.3</span>Desenhar uma grade como ladrilhos</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Cada célula vira um ladrilho, e cada parede ou passagem entre células também.</p>
+<p class="analogy"><span class="tag">Analogia</span> Um piso de azulejos: azulejos brancos são paredes, pretos são chão.</p>
+<pre><code data-lang="py"># um labirinto W x H vira uma matriz (2H+1) x (2W+1)
+W, H = 20, 15
+print(2 * H + 1, &quot;linhas x&quot;, 2 * W + 1, &quot;colunas&quot;)
+# a célula (x, y) fica no ladrilho (2x+1, 2y+1);
+# os ladrilhos pares entre elas são paredes ou passagens</code></pre>
+<div class="out"><div class="lbl">Saída</div><pre>31 linhas x 41 colunas</pre></div>
+<p class="where"><span class="tag">No projeto</span> <code>build_tiles</code> e <code>_tile_kind</code>. Um teste (<code>test_render_matches_grid</code>) garante que o desenho coincide com a grade.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Esquecer que há um ladrilho de parede a mais nas bordas: por isso 2n+1.</p>
+<details class="quiz"><summary>Teste rápido: Onde fica a célula (3, 2) na matriz de ladrilhos?</summary><p>Coluna 2·3+1 = 7, linha 2·2+1 = 5.</p></details>
+</article>
+<article class="concept" id="c-ctrl-c">
+<h3><span class="num">11.4</span>Ctrl+C e Ctrl+D</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Ctrl+C interrompe o programa (<code>KeyboardInterrupt</code>); Ctrl+D encerra a entrada (<code>EOFError</code>).</p>
+<p class="analogy"><span class="tag">Analogia</span> Alguém bate na porta (Ctrl+C) ou cala o telefone no meio da conversa (Ctrl+D): o programa deve se despedir com educação.</p>
+<pre><code data-lang="py">try:
+    choice = input(&quot;Choice: &quot;)
+except (EOFError, KeyboardInterrupt):
+    print(&quot;Bye!&quot;)</code></pre>
+<p class="where"><span class="tag">No projeto</span> <code>run_menu</code> e <code>main</code> tratam os dois: saem limpo, sem traceback. É um dos casos que a avaliação testa para buscar crash.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Não tratar: o usuário aperta Ctrl+C e vê um traceback, que conta como crash.</p>
+<details class="quiz"><summary>Teste rápido: O que o menu faz ao receber Ctrl+D?</summary><p>Imprime "Bye!" e termina normalmente.</p></details>
+</article>
+<article class="concept" id="c-callback">
+<h3><span class="num">11.5</span>Funções como valores (callbacks)</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Uma função pode ser passada como argumento para outra, que a chama quando quiser.</p>
+<p class="analogy"><span class="tag">Analogia</span> Deixar seu telefone com a recepção: "me ligue quando chegar".</p>
+<pre><code data-lang="py">def work(on_step):
+    for i in range(3):
+        on_step()              # chama a função recebida
+
+steps = []
+work(lambda: steps.append(&quot;passo&quot;))
+print(len(steps))</code></pre>
+<div class="out"><div class="lbl">Saída</div><pre>3</pre></div>
+<p class="where"><span class="tag">No projeto</span> <code>generate(on_step=...)</code>: o gerador chama a função depois de cada parede removida; o menu passa uma função que redesenha a tela, e daí vem a animação da geração (bônus). O gerador continua sem saber nada sobre terminal.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Escrever <code>on_step()</code> ao <em>passar</em> a função: isso a executa na hora. Passe só <code>on_step</code>.</p>
+<details class="quiz"><summary>Teste rápido: Por que o gerador usa callback em vez de imprimir direto?</summary><p>Para continuar reutilizável: quem usa decide o que fazer a cada passo.</p></details>
+</article></section>
+<section class="module" id="m12"><h2><span class="mod-num">Módulo 12.</span> Ferramentas do ecossistema</h2><p class="module-intro">O que cerca o código: versionamento, ambientes, empacotamento e automação.</p><article class="concept" id="c-git">
+<h3><span class="num">12.1</span>Git e .gitignore</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Git guarda o histórico do projeto; <code>.gitignore</code> lista o que ele deve ignorar.</p>
+<p class="analogy"><span class="tag">Analogia</span> Um caderno com todas as versões do seu trabalho, mais uma lista do que não precisa ser guardado (rascunhos).</p>
+<pre><code data-lang="sh">git status               # o que mudou?
+git add arquivo.py       # prepara para guardar
+git commit -m &quot;mensagem&quot; # guarda uma versão
+git clone &lt;url&gt;          # copia um repositório</code></pre>
+<p class="where"><span class="tag">No projeto</span> O <code>.gitignore</code> exclui <code>__pycache__/</code>, <code>.venv/</code>, caches, <code>build/</code> e <code>dist/</code>. Os arquivos <code>mazegen-*.whl/.tar.gz</code> da raiz <em>não</em> são ignorados: são entregáveis. A avaliação começa com um <code>git clone</code> numa pasta vazia.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Versionar arquivos gerados ou a pasta do ambiente virtual.</p>
+<details class="quiz"><summary>Teste rápido: Por que não versionar <code>.venv/</code>?</summary><p>É grande e se recria; só o <code>requirements.txt</code> importa.</p></details>
+</article>
+<article class="concept" id="c-venv">
+<h3><span class="num">12.2</span>Ambiente virtual (venv)</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Uma pasta com uma cópia isolada do Python e das bibliotecas só deste projeto.</p>
+<p class="analogy"><span class="tag">Analogia</span> Uma caixa de ferramentas própria para cada obra, sem misturar com as das outras.</p>
+<pre><code data-lang="sh">python3 -m venv .venv         # cria o ambiente
+source .venv/bin/activate      # entra nele
+pip install -r requirements.txt
+deactivate                     # sai</code></pre>
+<p class="where"><span class="tag">No projeto</span> <code>make install</code> cria o <code>.venv</code>; o resto do Makefile usa o Python de dentro dele se existir. Na avaliação, o pacote é instalado em <em>outro</em> venv para provar que funciona isolado.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Instalar pacotes no Python do sistema: pode conflitar com outros projetos (e alguns sistemas bloqueiam).</p>
+<details class="quiz"><summary>Teste rápido: Para que serve um venv?</summary><p>Isolar as dependências de cada projeto.</p></details>
+</article>
+<article class="concept" id="c-pip">
+<h3><span class="num">12.3</span>pip e requirements.txt</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> <code>pip</code> instala bibliotecas; <code>requirements.txt</code> lista quais.</p>
+<p class="analogy"><span class="tag">Analogia</span> <code>pip</code> é o entregador de ferramentas; o requirements é a lista de compras.</p>
+<pre><code data-lang="sh">pip install flake8            # uma biblioteca
+pip install -r requirements.txt   # todas as da lista
+pip list                          # o que está instalado</code></pre>
+<p class="where"><span class="tag">No projeto</span> <code>requirements.txt</code>: <code>flake8</code>, <code>mypy</code>, <code>pytest</code>, <code>build</code>. O programa em si não usa nenhuma biblioteca externa.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Rodar <code>pip</code> fora do venv e instalar no lugar errado.</p>
+<details class="quiz"><summary>Teste rápido: O programa final depende de bibliotecas externas?</summary><p>Não: só da biblioteca padrão do Python.</p></details>
+</article>
+<article class="concept" id="c-pacote">
+<h3><span class="num">12.4</span>Pacote: pyproject.toml, .whl e .tar.gz</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Empacotar é juntar o código e suas informações num arquivo instalável com <code>pip</code>.</p>
+<p class="analogy"><span class="tag">Analogia</span> Embalar um produto numa caixa com etiqueta (nome, versão, licença) para que qualquer pessoa instale.</p>
+<pre><code data-lang="sh">python -m build                # cria dist/mazegen-1.0.0*
+pip install mazegen-1.0.0-py3-none-any.whl
+python -c &quot;from mazegen import MazeGenerator; print(&#x27;ok&#x27;)&quot;</code></pre>
+<p class="where"><span class="tag">No projeto</span> <code>pyproject.toml</code> declara <code>name = "mazegen"</code>, versão, licença MIT e <code>packages = ["mazegen"]</code>. <code>make build</code> gera os dois arquivos e os copia para a raiz. O <code>.whl</code> é o pacote pronto; o <code>.tar.gz</code> é o código-fonte empacotado, para reconstruir.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Esquecer de listar a pasta do pacote no <code>pyproject.toml</code>: o arquivo sai vazio.</p>
+<details class="quiz"><summary>Teste rápido: Diferença entre <code>.whl</code> e <code>.tar.gz</code>?</summary><p><code>.whl</code>: pronto para instalar; <code>.tar.gz</code>: fonte que o pip constrói ao instalar.</p></details>
+</article>
+<article class="concept" id="c-makefile">
+<h3><span class="num">12.5</span>Makefile</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Um arquivo que dá nome a comandos comuns: <code>make run</code>, <code>make lint</code>...</p>
+<p class="analogy"><span class="tag">Analogia</span> Botões de atalho no controle remoto, em vez de decorar o comando comprido.</p>
+<pre><code data-lang="sh">run:
+	python3 a_maze_ing.py config.txt     # a linha começa com TAB, não espaços
+
+lint:
+	flake8 .
+	mypy . --strict</code></pre>
+<p class="where"><span class="tag">No projeto</span> O <code>Makefile</code> do projeto traz <code>install</code>, <code>run</code>, <code>debug</code>, <code>clean</code>, <code>lint</code>, <code>lint-strict</code> (os obrigatórios), mais <code>test</code> e <code>build</code>.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Usar espaços em vez de TAB antes do comando: <code>missing separator</code>.</p>
+<details class="quiz"><summary>Teste rápido: O que faz <code>make debug</code>?</summary><p>Roda o programa sob o depurador <code>pdb</code> (<code>python3 -m pdb</code>), para executar passo a passo.</p></details>
+</article>
+<article class="concept" id="c-licenca">
+<h3><span class="num">12.6</span>Licença de software (MIT)</h3>
+<p class="one"><span class="tag ok">Em uma frase</span> Um texto que diz o que os outros podem fazer com o seu código.</p>
+<p class="analogy"><span class="tag">Analogia</span> A etiqueta de uma obra: "pode copiar, contanto que mantenha meu nome".</p>
+<pre><code data-lang="sh">MIT: permite usar, copiar, modificar e redistribuir,
+inclusive em projetos de outras pessoas,
+desde que o aviso de copyright seja mantido.</code></pre>
+<p class="where"><span class="tag">No projeto</span> <code>LICENSE.md</code> na raiz e <code>license = "MIT"</code> no <code>pyproject.toml</code>: permite que o próximo projeto reutilize o gerador, como o enunciado pede. Lembre de colocar os logins no copyright.</p>
+<p class="mistake"><span class="tag warn">Erro comum</span> Sem licença, por padrão ninguém tem permissão de reutilizar o código.</p>
+<details class="quiz"><summary>Teste rápido: Por que escolher uma licença permissiva (MIT)?</summary><p>Porque o enunciado exige que ela permita a reutilização e distribuição do gerador.</p></details>
+</article></section>
+<section id="glossario">
+<h2>Glossário</h2>
+<dl class="gloss">
+<div><dt>Algoritmo</dt><dd>Receita de passos para resolver um problema. <a href="#c-dfs">ver</a></dd></div>
+<div><dt>Argumento</dt><dd>Valor entregue a um programa ou função ao chamá-lo. <a href="#c-argv">ver</a></dd></div>
+<div><dt>Atributo</dt><dd>Dado guardado dentro de um objeto. <a href="#c-atributos-metodos">ver</a></dd></div>
+<div><dt>BFS</dt><dd>Busca em largura: explora em ondas e acha o caminho mais curto. <a href="#c-bfs">ver</a></dd></div>
+<div><dt>Bit</dt><dd>Um 0 ou um 1; um interruptor. <a href="#c-binario">ver</a></dd></div>
+<div><dt>Braiding</dt><dd>Trançar: ligar becos sem saída a outros corredores. <a href="#c-braiding">ver</a></dd></div>
+<div><dt>Callback</dt><dd>Função passada a outra para ser chamada depois. <a href="#c-callback">ver</a></dd></div>
+<div><dt>Ciclo / laço</dt><dd>Caminho que volta ao ponto de partida; o oposto de árvore. <a href="#c-arvore">ver</a></dd></div>
+<div><dt>Classe</dt><dd>Molde para criar objetos. <a href="#c-classe-objeto">ver</a></dd></div>
+<div><dt>Comando</dt><dd>Instrução digitada no terminal. <a href="#c-terminal">ver</a></dd></div>
+<div><dt>Dataclass</dt><dd>Classe que gera o <code>__init__</code> sozinha. <a href="#c-dataclass">ver</a></dd></div>
+<div><dt>Dead end / beco</dt><dd>Célula com uma única abertura. <a href="#c-beco">ver</a></dd></div>
+<div><dt>DFS</dt><dd>Busca em profundidade; base do recursive backtracker. <a href="#c-dfs">ver</a></dd></div>
+<div><dt>Dicionário</dt><dd>Coleção de pares chave-valor. <a href="#c-dicionarios">ver</a></dd></div>
+<div><dt>Docstring</dt><dd>Texto de documentação dentro de uma função/classe. <a href="#c-docstrings">ver</a></dd></div>
+<div><dt>Exceção</dt><dd>Erro que interrompe o programa se não tratado. <a href="#c-excecoes">ver</a></dd></div>
+<div><dt>f-string</dt><dd>Texto com valores encaixados: <code>f"{x}"</code>. <a href="#c-texto">ver</a></dd></div>
+<div><dt>Fila (queue)</dt><dd>Primeiro a entrar, primeiro a sair. <a href="#c-deque">ver</a></dd></div>
+<div><dt>Flag</dt><dd>Bit que representa um sim/não (uma parede). <a href="#c-flags">ver</a></dd></div>
+<div><dt>flake8</dt><dd>Verificador de estilo (PEP 8). <a href="#c-flake8">ver</a></dd></div>
+<div><dt>Grafo</dt><dd>Conjunto de nós ligados por arestas. <a href="#c-grafo">ver</a></dd></div>
+<div><dt>Hexadecimal</dt><dd>Base 16 (0-9, A-F); um dígito = 4 bits. <a href="#c-hexadecimal">ver</a></dd></div>
+<div><dt>import</dt><dd>Traz código de outro módulo. <a href="#c-import">ver</a></dd></div>
+<div><dt>Interpretador</dt><dd>Programa que executa o código Python. <a href="#c-interpretador">ver</a></dd></div>
+<div><dt>Lista</dt><dd>Sequência ordenada e alterável. <a href="#c-listas">ver</a></dd></div>
+<div><dt>Makefile</dt><dd>Arquivo com atalhos para comandos. <a href="#c-makefile">ver</a></dd></div>
+<div><dt>mypy</dt><dd>Verificador de tipos. <a href="#c-mypy">ver</a></dd></div>
+<div><dt>Método</dt><dd>Função que pertence a um objeto. <a href="#c-atributos-metodos">ver</a></dd></div>
+<div><dt>Módulo</dt><dd>Um arquivo <code>.py</code> importável. <a href="#c-import">ver</a></dd></div>
+<div><dt>Objeto</dt><dd>Coisa criada a partir de uma classe. <a href="#c-classe-objeto">ver</a></dd></div>
+<div><dt>Pacote</dt><dd>Pasta de módulos; também o arquivo instalável. <a href="#c-pacotes">ver</a></dd></div>
+<div><dt>Parâmetro</dt><dd>Nome de entrada de uma função. <a href="#c-funcoes">ver</a></dd></div>
+<div><dt>PEP 8</dt><dd>Guia oficial de estilo do Python. <a href="#c-flake8">ver</a></dd></div>
+<div><dt>Perfeito (maze)</dt><dd>Labirinto com exatamente um caminho entre duas células. <a href="#c-arvore">ver</a></dd></div>
+<div><dt>Pilha (stack)</dt><dd>Último a entrar, primeiro a sair. <a href="#c-pilha-fila">ver</a></dd></div>
+<div><dt>pytest</dt><dd>Ferramenta de testes. <a href="#c-pytest">ver</a></dd></div>
+<div><dt>Recursão</dt><dd>Função que chama a si mesma. <a href="#c-recursao">ver</a></dd></div>
+<div><dt>Seed</dt><dd>Semente que torna o aleatório reproduzível. <a href="#c-aleatoriedade">ver</a></dd></div>
+<div><dt>Spanning tree</dt><dd>Árvore que liga todos os nós: o labirinto perfeito. <a href="#c-arvore">ver</a></dd></div>
+<div><dt>stderr / stdout</dt><dd>Canais de erro e de saída normal. <a href="#c-stderr">ver</a></dd></div>
+<div><dt>Terminal</dt><dd>Janela de comandos de texto. <a href="#c-terminal">ver</a></dd></div>
+<div><dt>Tipo</dt><dd>A categoria de um valor (int, str, bool...). <a href="#c-tipos">ver</a></dd></div>
+<div><dt>Tupla</dt><dd>Sequência imutável, como um par (x, y). <a href="#c-tuplas">ver</a></dd></div>
+<div><dt>Type hint</dt><dd>Anotação do tipo esperado. <a href="#c-type-hints">ver</a></dd></div>
+<div><dt>venv</dt><dd>Ambiente virtual isolado. <a href="#c-venv">ver</a></dd></div>
+<div><dt>Wheel (.whl)</dt><dd>Pacote Python pronto para instalar. <a href="#c-pacote">ver</a></dd></div>
+</dl>
+</section>
+
+<section id="defesa">
+<h2>Roteiro da defesa</h2>
+<p>Cada integrante deve conseguir responder a tudo isto, com as próprias
+palavras e <em>sem consultar</em>. Os "testes rápidos" de cada conceito são
+o ensaio.</p>
+<ol>
+<li><strong>Fluxo geral:</strong> o que acontece entre
+<code>python3 a_maze_ing.py config.txt</code> e o menu aparecer?
+(Início, passos 1 a 6.)</li>
+<li><strong>Representação:</strong> o que significa o dígito <code>A</code>
+no arquivo? Como <code>_open</code> garante que as paredes coincidem?
+(Módulo 8.)</li>
+<li><strong>Geração:</strong> explique o DFS iterativo com a pilha; por que
+não recursivo? (Módulo 10.)</li>
+<li><strong>Modo jogável:</strong> o que é o braiding, por que a checagem
+3x3 e por que sobram os becos do "2"? (Módulos 9 e 10.)</li>
+<li><strong>Solução:</strong> como o BFS garante o caminho mais curto e como
+o caminho vira <code>N/E/S/W</code>? (Módulo 10.)</li>
+<li><strong>Reprodução:</strong> o que a seed faz e por que usamos
+<code>random.Random(seed)</code>? (Módulo 10.)</li>
+<li><strong>Erros:</strong> mostre o que acontece com cada erro de
+configuração e com Ctrl+C / Ctrl+D. (Módulo 6 e 11.)</li>
+<li><strong>Pacote:</strong> como reconstruir o <code>.whl</code> num
+venv e instalar noutro? (Módulo 12.)</li>
+<li><strong>Qualidade:</strong> rode <code>make lint</code> e
+<code>make test</code> e explique o que cada ferramenta checa.
+(Módulo 7.)</li>
+<li><strong>Modificação surpresa:</strong> treine pequenas mudanças
+(trocar uma cor, adicionar uma chave de config, mudar o tamanho mínimo do
+"42") e rode os testes depois.</li>
+</ol>
+</section>
+
+</main>
+</div>
+<script>
+/* ===== Motor do labirinto (sem DOM): espelha mazegen/generator.py ===== */
+var MazeEngine = (function () {
+  'use strict';
+
+  var N = 1, E = 2, S = 4, W = 8;
+  var DIRS = [
+    { b: N, dx: 0, dy: -1, o: S, name: 'norte' },
+    { b: E, dx: 1, dy: 0, o: W, name: 'leste' },
+    { b: S, dx: 0, dy: 1, o: N, name: 'sul' },
+    { b: W, dx: -1, dy: 0, o: E, name: 'oeste' }
+  ];
+
+  function mulberry32(a) {
+    return function () {
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      var t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function newGrid(w, h) {
+    var g = [];
+    for (var y = 0; y < h; y++) { g.push(new Array(w).fill(15)); }
+    return g;
+  }
+  function cloneGrid(g) { return g.map(function (r) { return r.slice(); }); }
+  function inb(w, h, x, y) { return x >= 0 && y >= 0 && x < w && y < h; }
+  function openWall(g, x, y, d) {
+    g[y][x] &= ~d.b;
+    g[y + d.dy][x + d.dx] &= ~d.o;
+  }
+  function closeWall(g, x, y, d) {
+    g[y][x] |= d.b;
+    g[y + d.dy][x + d.dx] |= d.o;
+  }
+  function pick(rnd, arr) { return arr[Math.floor(rnd() * arr.length)]; }
+  function shuffle(rnd, arr) {
+    for (var i = arr.length - 1; i > 0; i--) {
+      var j = Math.floor(rnd() * (i + 1));
+      var t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+    }
+    return arr;
+  }
+  function walls(c) {
+    var n = 0;
+    for (var i = 0; i < 4; i++) { if (c & (1 << i)) { n++; } }
+    return n;
+  }
+  function key(x, y) { return x + ',' + y; }
+
+  /* DFS iterativo (pilha explicita), registrando um quadro por passo. */
+  function dfsFrames(w, h, seed) {
+    var rnd = mulberry32(seed), g = newGrid(w, h);
+    var vis = {}, stack = [[0, 0]], frames = [];
+    vis[key(0, 0)] = true;
+    function snap(cur, msg) {
+      frames.push({
+        g: cloneGrid(g),
+        stack: stack.map(function (c) { return c.slice(); }),
+        cur: cur ? cur.slice() : null,
+        vis: Object.keys(vis),
+        msg: msg
+      });
+    }
+    snap([0, 0], 'Começamos em (0,0): a célula entra na pilha e é ' +
+      'marcada como visitada.');
+    while (stack.length) {
+      var top = stack[stack.length - 1], x = top[0], y = top[1];
+      var opts = DIRS.filter(function (d) {
+        return inb(w, h, x + d.dx, y + d.dy) && !vis[key(x + d.dx, y + d.dy)];
+      });
+      if (!opts.length) {
+        stack.pop();
+        if (stack.length) {
+          var back = stack[stack.length - 1];
+          snap(back, 'Sem vizinhos novos em (' + x + ',' + y + '): ' +
+            'tira da pilha e volta para (' + back[0] + ',' + back[1] + ').');
+        }
+        continue;
+      }
+      var d = pick(rnd, opts);
+      openWall(g, x, y, d);
+      var nx = x + d.dx, ny = y + d.dy;
+      vis[key(nx, ny)] = true;
+      stack.push([nx, ny]);
+      snap([nx, ny], 'Sorteia ' + d.name + ': derruba a parede entre (' +
+        x + ',' + y + ') e (' + nx + ',' + ny + '), avança e empilha.');
+    }
+    snap(null, 'A pilha esvaziou: todas as células foram visitadas e o ' +
+      'labirinto perfeito está pronto.');
+    return { frames: frames, grid: g };
+  }
+
+  /* BFS: uma onda por quadro; no fim reconstrói o caminho. */
+  function bfsFrames(g, w, h, start, goal) {
+    var parents = {}, dist = {}, queue = [start], frames = [];
+    parents[key(start[0], start[1])] = null;
+    dist[key(start[0], start[1])] = 0;
+    function snap(cur, msg, path) {
+      frames.push({
+        queue: queue.map(function (c) { return c.slice(); }),
+        dist: JSON.parse(JSON.stringify(dist)),
+        cur: cur, msg: msg, path: path || null
+      });
+    }
+    snap(start, 'Começa pela entrada (' + start[0] + ',' + start[1] +
+      '), distância 0, e a coloca na fila.');
+    while (queue.length) {
+      var cur = queue.shift(), cx = cur[0], cy = cur[1];
+      var dcur = dist[key(cx, cy)];
+      if (cx === goal[0] && cy === goal[1]) {
+        var path = [], node = cur;
+        while (node) {
+          path.push(node);
+          node = parents[key(node[0], node[1])];
+        }
+        path.reverse();
+        snap(cur, 'Chegou à saída com distância ' + dcur + '. Seguindo ' +
+          'os "pais" de trás para frente, temos o caminho mais curto ' +
+          '(' + dcur + ' passos).', path);
+        break;
+      }
+      var added = 0;
+      DIRS.forEach(function (d) {
+        if (g[cy][cx] & d.b) { return; }
+        var nx = cx + d.dx, ny = cy + d.dy;
+        if (!(key(nx, ny) in parents)) {
+          parents[key(nx, ny)] = cur;
+          dist[key(nx, ny)] = dcur + 1;
+          queue.push([nx, ny]);
+          added++;
+        }
+      });
+      snap(cur, 'Tira (' + cx + ',' + cy + ') da fila (distância ' + dcur +
+        ') e enfileira ' + added + ' vizinho(s) ainda não visto(s).');
+    }
+    return frames;
+  }
+
+  function windowOpen(g, w, h, left, top) {
+    if (left < 0 || top < 0 || left + 3 > w || top + 3 > h) { return false; }
+    for (var j = 0; j < 3; j++) {
+      for (var i = 0; i < 3; i++) {
+        var c = g[top + j][left + i];
+        if ((i < 2 && (c & E)) || (j < 2 && (c & S))) { return false; }
+      }
+    }
+    return true;
+  }
+  function openBlockNear(g, w, h, x, y) {
+    for (var left = x - 2; left <= x; left++) {
+      for (var top = y - 2; top <= y; top++) {
+        if (windowOpen(g, w, h, left, top)) { return true; }
+      }
+    }
+    return false;
+  }
+  function countOpenBlocks(g, w, h) {
+    var n = 0;
+    for (var y = 0; y < h; y++) {
+      for (var x = 0; x < w; x++) {
+        if (windowOpen(g, w, h, x, y)) { n++; }
+      }
+    }
+    return n;
+  }
+  function deadEnds(g, w, h) {
+    var out = [];
+    for (var y = 0; y < h; y++) {
+      for (var x = 0; x < w; x++) {
+        if (walls(g[y][x]) === 3) { out.push([x, y]); }
+      }
+    }
+    return out;
+  }
+  function loopCount(g, w, h) {
+    var passages = 0;
+    for (var y = 0; y < h; y++) {
+      for (var x = 0; x < w; x++) {
+        if (!(g[y][x] & E)) { passages++; }
+        if (!(g[y][x] & S)) { passages++; }
+      }
+    }
+    return passages - w * h + 1;
+  }
+
+  /* Trança o labirinto (modifica g); devolve as paredes abertas. */
+  function braid(g, w, h, rnd) {
+    var actions = [], progress = true;
+    while (progress) {
+      progress = false;
+      var des = shuffle(rnd, deadEnds(g, w, h));
+      for (var k = 0; k < des.length; k++) {
+        var x = des[k][0], y = des[k][1];
+        if (walls(g[y][x]) !== 3) { continue; }
+        var cands = shuffle(rnd, DIRS.filter(function (d) {
+          return inb(w, h, x + d.dx, y + d.dy) && (g[y][x] & d.b);
+        }));
+        cands.sort(function (a, b) {
+          var wa = walls(g[y + a.dy][x + a.dx]) !== 3 ? 1 : 0;
+          var wb = walls(g[y + b.dy][x + b.dx]) !== 3 ? 1 : 0;
+          return wa - wb;
+        });
+        for (var c = 0; c < cands.length; c++) {
+          var d = cands[c], nx = x + d.dx, ny = y + d.dy;
+          openWall(g, x, y, d);
+          if (openBlockNear(g, w, h, x, y) || openBlockNear(g, w, h, nx, ny)) {
+            closeWall(g, x, y, d);
+            continue;
+          }
+          actions.push({ x: x, y: y, nx: nx, ny: ny });
+          progress = true;
+          break;
+        }
+      }
+    }
+    return actions;
+  }
+
+  function hexRows(g) {
+    return g.map(function (row) {
+      return row.map(function (c) { return c.toString(16).toUpperCase(); })
+        .join('');
+    });
+  }
+
+  return {
+    N: N, E: E, S: S, W: W, DIRS: DIRS, mulberry32: mulberry32,
+    newGrid: newGrid, cloneGrid: cloneGrid, dfsFrames: dfsFrames,
+    bfsFrames: bfsFrames, braid: braid, deadEnds: deadEnds,
+    loopCount: loopCount, countOpenBlocks: countOpenBlocks,
+    hexRows: hexRows, walls: walls
+  };
+})();
+
+if (typeof module !== 'undefined') { module.exports = MazeEngine; }
+
+</script>
+<script>
+/* ===== Interface: tema, progresso, busca, destaque de código, widgets ===== */
+(function () {
+  'use strict';
+  var M = MazeEngine;
+
+  /* ---------- utilidades ---------- */
+  function store(op, k, v) {
+    try {
+      if (op === 'get') { return window.localStorage.getItem(k); }
+      window.localStorage.setItem(k, v);
+    } catch (e) { /* sem armazenamento: tudo continua funcionando */ }
+    return null;
+  }
+  function el(tag, cls, html) {
+    var e = document.createElement(tag);
+    if (cls) { e.className = cls; }
+    if (html !== undefined) { e.innerHTML = html; }
+    return e;
+  }
+  function css(name) {
+    return getComputedStyle(document.documentElement)
+      .getPropertyValue(name).trim();
+  }
+  function button(label, onclick, cls) {
+    var b = el('button', cls || 'btn', label);
+    b.type = 'button';
+    b.addEventListener('click', onclick);
+    return b;
+  }
+  function numberInput(value, min, max) {
+    var i = el('input', 'num-input');
+    i.type = 'number'; i.value = value; i.min = min; i.max = max;
+    return i;
+  }
+  function seedValue(input, fallback) {
+    var v = parseInt(input.value, 10);
+    return isNaN(v) ? fallback : Math.max(0, Math.min(99999, v));
+  }
+  var redraws = [];
+  function register(fn) { redraws.push(fn); fn(); }
+
+  /* ---------- tema ---------- */
+  var root = document.documentElement;
+  var saved = store('get', 'estudo-tema');
+  if (saved === 'light' || saved === 'dark') {
+    root.setAttribute('data-theme', saved);
+  }
+  document.getElementById('theme-btn').addEventListener('click', function () {
+    var dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    var cur = root.getAttribute('data-theme') || (dark ? 'dark' : 'light');
+    var next = cur === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    store('set', 'estudo-tema', next);
+    redraws.forEach(function (fn) { fn(); });
+  });
+
+  /* ---------- destaque de sintaxe Python ---------- */
+  var KW = 'def|class|return|if|elif|else|for|while|in|not|and|or|import|' +
+    'from|as|with|try|except|raise|break|continue|pass|None|True|False|' +
+    'lambda|is|yield';
+  var TOKEN = new RegExp(
+    '(#.*$)|("""[\\s\\S]*?"""|f?"(?:\\\\.|[^"\\\\\\n])*"|' +
+    "f?'(?:\\\\.|[^'\\\\\\n])*')|\\b(" + KW + ')\\b|\\b(\\d+(?:\\.\\d+)?)\\b',
+    'gm');
+  function esc(s) {
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+  function highlight(text, lang) {
+    if (lang === 'sh') {
+      return esc(text).replace(/(#.*$)/gm, '<span class="tk-c">$1</span>');
+    }
+    var out = '', last = 0, m;
+    TOKEN.lastIndex = 0;
+    while ((m = TOKEN.exec(text)) !== null) {
+      out += esc(text.slice(last, m.index));
+      var cls = m[1] ? 'tk-c' : m[2] ? 'tk-s' : m[3] ? 'tk-k' : 'tk-n';
+      out += '<span class="' + cls + '">' + esc(m[0]) + '</span>';
+      last = m.index + m[0].length;
+    }
+    return out + esc(text.slice(last));
+  }
+  Array.prototype.forEach.call(
+    document.querySelectorAll('pre code[data-lang]'), function (c) {
+      c.innerHTML = highlight(c.textContent, c.getAttribute('data-lang'));
+    });
+
+  /* ---------- progresso (módulos lidos) ---------- */
+  var checks = Array.prototype.slice.call(
+    document.querySelectorAll('.read-check'));
+  var done = {};
+  try { done = JSON.parse(store('get', 'estudo-lidos') || '{}') || {}; }
+  catch (e) { done = {}; }
+  function updateProgress() {
+    var n = checks.filter(function (c) { return c.checked; }).length;
+    document.getElementById('progress-text').textContent =
+      n + ' de ' + checks.length + ' módulos lidos';
+    document.getElementById('progress-bar').style.width =
+      (100 * n / checks.length) + '%';
+  }
+  checks.forEach(function (c) {
+    c.checked = !!done[c.value];
+    c.addEventListener('change', function () {
+      done[c.value] = c.checked;
+      store('set', 'estudo-lidos', JSON.stringify(done));
+      updateProgress();
+    });
+  });
+  updateProgress();
+
+  /* ---------- menu móvel e busca ---------- */
+  var side = document.getElementById('side');
+  document.getElementById('menu-btn').addEventListener('click', function () {
+    side.classList.toggle('open');
+  });
+  side.addEventListener('click', function (e) {
+    if (e.target.tagName === 'A') { side.classList.remove('open'); }
+  });
+  var search = document.getElementById('search');
+  search.addEventListener('input', function () {
+    var q = search.value.trim().toLowerCase();
+    Array.prototype.forEach.call(
+      document.querySelectorAll('section.module'), function (sec) {
+        var any = false;
+        Array.prototype.forEach.call(
+          sec.querySelectorAll('.concept'), function (c) {
+            var hit = !q || c.textContent.toLowerCase().indexOf(q) !== -1;
+            c.hidden = !hit;
+            if (hit) { any = true; }
+          });
+        sec.hidden = !any;
+      });
+  });
+
+  /* ---------- desenho do labirinto ---------- */
+  function drawMaze(cv, g, o) {
+    o = o || {};
+    var h = g.length, w = g[0].length;
+    var cs = Math.min(cv.width / w, cv.height / h);
+    var ctx = cv.getContext('2d');
+    ctx.fillStyle = css('--c-bg');
+    ctx.fillRect(0, 0, cv.width, cv.height);
+    var x, y, color;
+    for (y = 0; y < h; y++) {
+      for (x = 0; x < w; x++) {
+        color = o.fill ? o.fill(x, y) : null;
+        if (color) {
+          ctx.fillStyle = color;
+          ctx.fillRect(x * cs + 1, y * cs + 1, cs - 2, cs - 2);
+        }
+        if (o.label) {
+          var t = o.label(x, y);
+          if (t !== null && t !== undefined) {
+            ctx.fillStyle = css('--c-text');
+            ctx.font = Math.round(cs * 0.34) + 'px sans-serif';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText(String(t), x * cs + cs / 2, y * cs + cs / 2);
+          }
+        }
+      }
+    }
+    ctx.strokeStyle = css('--c-wall');
+    ctx.lineWidth = Math.max(2, cs * 0.07);
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    for (y = 0; y < h; y++) {
+      for (x = 0; x < w; x++) {
+        var c = g[y][x], px = x * cs, py = y * cs;
+        if (c & M.N) { ctx.moveTo(px, py); ctx.lineTo(px + cs, py); }
+        if (c & M.W) { ctx.moveTo(px, py); ctx.lineTo(px, py + cs); }
+        if ((c & M.E) && x === w - 1) {
+          ctx.moveTo(px + cs, py); ctx.lineTo(px + cs, py + cs);
+        }
+        if ((c & M.S) && y === h - 1) {
+          ctx.moveTo(px, py + cs); ctx.lineTo(px + cs, py + cs);
+        }
+      }
+    }
+    ctx.stroke();
+    if (o.after) { o.after(ctx, cs); }
+  }
+  function makeCanvas(w, h, px) {
+    var cv = el('canvas', 'maze-canvas');
+    cv.width = px;
+    cv.height = Math.round(px * h / w);
+    return cv;
+  }
+  function mark(ctx, cs, x, y, color, text) {
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(x * cs + cs / 2, y * cs + cs / 2, cs * 0.28, 0, 6.2832);
+    ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold ' + Math.round(cs * 0.3) + 'px sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(text, x * cs + cs / 2, y * cs + cs / 2 + 1);
+  }
+  function legend(items) {
+    var d = el('div', 'legend');
+    items.forEach(function (it) {
+      d.appendChild(el('span', 'lg', '<i style="background:var(' + it[0] +
+        ')"></i> ' + it[1]));
+    });
+    return d;
+  }
+  function pad(n) { return n < 10 ? '0' + n : String(n); }
+
+  /* ---------- widget: decodificador de célula ---------- */
+  function decoderWidget(box) {
+    var closed = { N: true, E: true, S: false, W: false };
+    var bits = { N: 1, E: 2, S: 4, W: 8 };
+    var cv = el('canvas', 'cell-canvas'); cv.width = 130; cv.height = 130;
+    var info = el('div', 'decoder-info');
+    var btns = el('div', 'btn-row');
+    var hexIn = el('input', 'num-input hex-input');
+    hexIn.maxLength = 1; hexIn.value = '3';
+    function value() {
+      return ['N', 'E', 'S', 'W'].reduce(function (s, k) {
+        return s + (closed[k] ? bits[k] : 0);
+      }, 0);
+    }
+    function render() {
+      var v = value();
+      var g = [[v]];
+      drawMaze(cv, g, { fill: function () { return css('--c-visited'); } });
+      var parts = ['N', 'E', 'S', 'W'].filter(function (k) {
+        return closed[k];
+      });
+      var sum = parts.map(function (k) { return bits[k]; });
+      var bin = ('0000' + v.toString(2)).slice(-4);
+      info.innerHTML =
+        '<p><strong>Paredes fechadas:</strong> ' +
+        (parts.length ? parts.join(', ') : 'nenhuma') + '</p>' +
+        '<p><strong>Conta:</strong> ' + (sum.length ? sum.join(' + ') :
+          '0') + ' = <strong>' + v + '</strong></p>' +
+        '<p><strong>Binário</strong> (Oeste, Sul, Leste, Norte): ' +
+        '<code>' + bin + '</code></p>' +
+        '<p><strong>Dígito no arquivo:</strong> ' +
+        '<code class="big">' + v.toString(16).toUpperCase() + '</code></p>';
+      hexIn.value = v.toString(16).toUpperCase();
+      ['N', 'E', 'S', 'W'].forEach(function (k) {
+        toggles[k].setAttribute('aria-pressed', closed[k] ? 'true' : 'false');
+        toggles[k].classList.toggle('on', closed[k]);
+      });
+    }
+    var toggles = {};
+    [['N', 'Norte (1)'], ['E', 'Leste (2)'], ['S', 'Sul (4)'],
+      ['W', 'Oeste (8)']].forEach(function (p) {
+      toggles[p[0]] = button(p[1], function () {
+        closed[p[0]] = !closed[p[0]]; render();
+      }, 'btn toggle');
+      btns.appendChild(toggles[p[0]]);
+    });
+    hexIn.addEventListener('input', function () {
+      var v = parseInt(hexIn.value, 16);
+      if (isNaN(v)) { return; }
+      ['N', 'E', 'S', 'W'].forEach(function (k) {
+        closed[k] = !!(v & bits[k]);
+      });
+      render();
+    });
+    var left = el('div', 'decoder-left');
+    left.appendChild(cv);
+    var right = el('div', 'decoder-right');
+    right.appendChild(el('p', 'hint', 'Clique nos botões (parede ' +
+      '<strong>acesa</strong> = fechada) ou digite um dígito de 0 a F:'));
+    right.appendChild(btns);
+    var row = el('div', 'btn-row');
+    row.appendChild(el('label', null, 'Dígito hex: '));
+    row.appendChild(hexIn);
+    right.appendChild(row);
+    right.appendChild(info);
+    box.appendChild(left); box.appendChild(right);
+    register(render);
+  }
+
+  /* ---------- widget: DFS passo a passo ---------- */
+  function dfsWidget(box) {
+    var W = 6, H = 6, idx = 0, data, timer = null;
+    var seedIn = numberInput(7, 0, 99999);
+    var cv = makeCanvas(W, H, 330);
+    var msg = el('p', 'step-msg');
+    var stackBox = el('p', 'stack-box');
+    var counter = el('span', 'counter');
+    function load() {
+      data = M.dfsFrames(W, H, seedValue(seedIn, 7)); idx = 0; render();
+    }
+    function render() {
+      var f = data.frames[idx];
+      var inStack = {};
+      f.stack.forEach(function (c) { inStack[c[0] + ',' + c[1]] = true; });
+      var vis = {};
+      f.vis.forEach(function (k) { vis[k] = true; });
+      drawMaze(cv, f.g, {
+        fill: function (x, y) {
+          var k = x + ',' + y;
+          if (f.cur && f.cur[0] === x && f.cur[1] === y) {
+            return css('--c-cur');
+          }
+          if (inStack[k]) { return css('--c-stack'); }
+          if (vis[k]) { return css('--c-visited'); }
+          return css('--c-unvisited');
+        }
+      });
+      counter.textContent = 'Passo ' + (idx + 1) + ' de ' +
+        data.frames.length;
+      msg.textContent = f.msg;
+      stackBox.innerHTML = '<strong>Pilha</strong> (base → topo): ' +
+        (f.stack.length ? f.stack.map(function (c) {
+          return '(' + c[0] + ',' + c[1] + ')';
+        }).join(' → ') : '<em>vazia</em>');
+    }
+    function stop() {
+      if (timer) { clearInterval(timer); timer = null; }
+      playBtn.textContent = '▶ Tocar';
+    }
+    function step(d) {
+      stop();
+      idx = Math.max(0, Math.min(data.frames.length - 1, idx + d));
+      render();
+    }
+    var playBtn = button('▶ Tocar', function () {
+      if (timer) { stop(); return; }
+      if (idx >= data.frames.length - 1) { idx = 0; }
+      playBtn.textContent = '⏸ Pausar';
+      timer = setInterval(function () {
+        if (idx >= data.frames.length - 1) { stop(); return; }
+        idx++; render();
+      }, 350);
+    });
+    var controls = el('div', 'btn-row');
+    controls.appendChild(button('◀ Voltar', function () { step(-1); }));
+    controls.appendChild(button('Passo ▶', function () { step(1); }));
+    controls.appendChild(playBtn);
+    controls.appendChild(button('⟲ Reiniciar', function () {
+      stop(); idx = 0; render();
+    }));
+    var seedRow = el('div', 'btn-row');
+    seedRow.appendChild(el('label', null, 'Seed: '));
+    seedRow.appendChild(seedIn);
+    seedRow.appendChild(button('Gerar outro', function () { stop(); load(); }));
+    box.appendChild(cv);
+    var side = el('div', 'widget-side');
+    side.appendChild(counter);
+    side.appendChild(msg);
+    side.appendChild(stackBox);
+    side.appendChild(controls);
+    side.appendChild(seedRow);
+    side.appendChild(legend([['--c-cur', 'célula atual'],
+      ['--c-stack', 'na pilha'], ['--c-visited', 'visitada'],
+      ['--c-unvisited', 'ainda não visitada']]));
+    box.appendChild(side);
+    data = M.dfsFrames(W, H, 7);
+    register(function () { render(); });
+    seedIn.addEventListener('change', function () { stop(); load(); });
+  }
+
+  /* ---------- widget: BFS passo a passo ---------- */
+  function bfsWidget(box) {
+    var W = 6, H = 6, idx = 0, frames, grid, timer = null;
+    var seedIn = numberInput(7, 0, 99999);
+    var cv = makeCanvas(W, H, 330);
+    var msg = el('p', 'step-msg');
+    var queueBox = el('p', 'stack-box');
+    var counter = el('span', 'counter');
+    function load() {
+      grid = M.dfsFrames(W, H, seedValue(seedIn, 7)).grid;
+      frames = M.bfsFrames(grid, W, H, [0, 0], [W - 1, H - 1]);
+      idx = 0; render();
+    }
+    function render() {
+      var f = frames[idx], onPath = {}, inQ = {};
+      if (f.path) {
+        f.path.forEach(function (c) { onPath[c[0] + ',' + c[1]] = true; });
+      }
+      f.queue.forEach(function (c) { inQ[c[0] + ',' + c[1]] = true; });
+      drawMaze(cv, grid, {
+        fill: function (x, y) {
+          var k = x + ',' + y;
+          if (onPath[k]) { return css('--c-path'); }
+          if (f.cur && f.cur[0] === x && f.cur[1] === y) {
+            return css('--c-cur');
+          }
+          if (inQ[k]) { return css('--c-queue'); }
+          if (k in f.dist) { return css('--c-visited'); }
+          return null;
+        },
+        label: function (x, y) {
+          var k = x + ',' + y;
+          return k in f.dist ? f.dist[k] : null;
+        },
+        after: function (ctx, cs) {
+          mark(ctx, cs, 0, 0, css('--c-start'), 'E');
+          mark(ctx, cs, W - 1, H - 1, css('--c-goal'), 'S');
+        }
+      });
+      counter.textContent = 'Passo ' + (idx + 1) + ' de ' + frames.length;
+      msg.textContent = f.msg;
+      queueBox.innerHTML = '<strong>Fila</strong> (próxima → última): ' +
+        (f.queue.length ? f.queue.map(function (c) {
+          return '(' + c[0] + ',' + c[1] + ')';
+        }).join(' ') : '<em>vazia</em>');
+    }
+    function stop() {
+      if (timer) { clearInterval(timer); timer = null; }
+      playBtn.textContent = '▶ Tocar';
+    }
+    function step(d) {
+      stop();
+      idx = Math.max(0, Math.min(frames.length - 1, idx + d));
+      render();
+    }
+    var playBtn = button('▶ Tocar', function () {
+      if (timer) { stop(); return; }
+      if (idx >= frames.length - 1) { idx = 0; }
+      playBtn.textContent = '⏸ Pausar';
+      timer = setInterval(function () {
+        if (idx >= frames.length - 1) { stop(); return; }
+        idx++; render();
+      }, 300);
+    });
+    var controls = el('div', 'btn-row');
+    controls.appendChild(button('◀ Voltar', function () { step(-1); }));
+    controls.appendChild(button('Passo ▶', function () { step(1); }));
+    controls.appendChild(playBtn);
+    controls.appendChild(button('⟲ Reiniciar', function () {
+      stop(); idx = 0; render();
+    }));
+    var seedRow = el('div', 'btn-row');
+    seedRow.appendChild(el('label', null, 'Seed do labirinto: '));
+    seedRow.appendChild(seedIn);
+    seedRow.appendChild(button('Gerar outro', function () { stop(); load(); }));
+    box.appendChild(cv);
+    var side = el('div', 'widget-side');
+    side.appendChild(counter);
+    side.appendChild(msg);
+    side.appendChild(queueBox);
+    side.appendChild(controls);
+    side.appendChild(seedRow);
+    side.appendChild(el('p', 'hint', 'Os números são a distância até a ' +
+      'entrada (E). A saída é S.'));
+    side.appendChild(legend([['--c-cur', 'célula tirada da fila'],
+      ['--c-queue', 'esperando na fila'], ['--c-visited', 'já vista'],
+      ['--c-path', 'caminho mais curto']]));
+    box.appendChild(side);
+    grid = M.dfsFrames(W, H, 7).grid;
+    frames = M.bfsFrames(grid, W, H, [0, 0], [W - 1, H - 1]);
+    register(function () { render(); });
+    seedIn.addEventListener('change', function () { stop(); load(); });
+  }
+
+  /* ---------- widget: braiding antes/depois ---------- */
+  function braidWidget(box) {
+    var W = 10, H = 7, base, cur, shown = 'perfect';
+    var seedIn = numberInput(5, 0, 99999);
+    var cv = makeCanvas(W, H, 420);
+    var stats = el('div', 'braid-stats');
+    var markDead = false;
+    function load() {
+      base = M.dfsFrames(W, H, seedValue(seedIn, 5)).grid;
+      cur = M.cloneGrid(base); shown = 'perfect'; markDead = false;
+      render();
+    }
+    function render() {
+      var dead = M.deadEnds(cur, W, H);
+      var isDead = {};
+      dead.forEach(function (c) { isDead[c[0] + ',' + c[1]] = true; });
+      drawMaze(cv, cur, {
+        fill: function (x, y) {
+          return markDead && isDead[x + ',' + y] ? css('--c-dead') : null;
+        }
+      });
+      stats.innerHTML =
+        '<p><strong>Estado:</strong> ' + (shown === 'perfect' ?
+          'labirinto perfeito (árvore)' : 'trançado') + '</p>' +
+        '<p><strong>Becos sem saída:</strong> <code>' + dead.length +
+        '</code> &nbsp; <strong>Laços:</strong> <code>' +
+        M.loopCount(cur, W, H) + '</code> &nbsp; ' +
+        '<strong>Áreas 3×3 abertas:</strong> <code>' +
+        M.countOpenBlocks(cur, W, H) + '</code></p>';
+    }
+    var row = el('div', 'btn-row');
+    row.appendChild(button('Marcar becos', function () {
+      markDead = !markDead; render();
+    }));
+    row.appendChild(button('Trançar ✂', function () {
+      if (shown === 'perfect') {
+        M.braid(cur, W, H, M.mulberry32(seedValue(seedIn, 5) + 1));
+        shown = 'braided'; render();
+      }
+    }));
+    row.appendChild(button('⟲ Voltar ao perfeito', function () {
+      cur = M.cloneGrid(base); shown = 'perfect'; render();
+    }));
+    var seedRow = el('div', 'btn-row');
+    seedRow.appendChild(el('label', null, 'Seed: '));
+    seedRow.appendChild(seedIn);
+    seedRow.appendChild(button('Gerar outro', load));
+    box.appendChild(cv);
+    var side = el('div', 'widget-side');
+    side.appendChild(row);
+    side.appendChild(stats);
+    side.appendChild(seedRow);
+    side.appendChild(el('p', 'hint', 'No perfeito há 0 laços. Depois de ' +
+      'trançar, cada beco ganha uma saída extra, sem nunca abrir uma ' +
+      'área 3×3.'));
+    side.appendChild(legend([['--c-dead', 'beco sem saída']]));
+    box.appendChild(side);
+    load();
+    register(render);
+    seedIn.addEventListener('change', load);
+  }
+
+  /* ---------- widget: seed e arquivo de saída ---------- */
+  function seedWidget(box) {
+    var W = 8, H = 6;
+    var seedIn = numberInput(42, 0, 99999);
+    var cvA = makeCanvas(W, H, 220), cvB = makeCanvas(W, H, 220),
+      cvC = makeCanvas(W, H, 220);
+    var txtA = el('pre', 'hexbox'), verdict = el('p', 'step-msg');
+    function render() {
+      var s = seedValue(seedIn, 42);
+      var a = M.dfsFrames(W, H, s).grid;
+      var b = M.dfsFrames(W, H, s).grid;
+      var c = M.dfsFrames(W, H, s + 1).grid;
+      drawMaze(cvA, a); drawMaze(cvB, b); drawMaze(cvC, c);
+      var ha = M.hexRows(a).join('\n');
+      txtA.textContent = ha;
+      var same = ha === M.hexRows(b).join('\n');
+      var diff = ha !== M.hexRows(c).join('\n');
+      verdict.innerHTML = 'Seed ' + s + ' duas vezes: <strong>' +
+        (same ? 'idêntico' : 'diferente') + '</strong>. Seed ' + (s + 1) +
+        ': <strong>' + (diff ? 'diferente' : 'idêntico') + '</strong>.';
+    }
+    var row = el('div', 'btn-row');
+    row.appendChild(el('label', null, 'Seed: '));
+    row.appendChild(seedIn);
+    row.appendChild(button('Seed aleatória', function () {
+      seedIn.value = Math.floor(Math.random() * 100000); render();
+    }));
+    seedIn.addEventListener('input', render);
+    var grid = el('div', 'seed-grid');
+    [[cvA, 'Seed ' + 'N'], [cvB, 'Seed N (de novo)'],
+      [cvC, 'Seed N+1']].forEach(function (p) {
+      var f = el('figure', 'fig');
+      f.appendChild(p[0]);
+      f.appendChild(el('figcaption', null, p[1]));
+      grid.appendChild(f);
+    });
+    box.classList.add('column');
+    box.appendChild(row);
+    box.appendChild(grid);
+    box.appendChild(verdict);
+    box.appendChild(el('p', 'hint', 'Texto do arquivo de saída ' +
+      '(um dígito hexadecimal por célula) para a seed N:'));
+    box.appendChild(txtA);
+    register(render);
+  }
+
+  var makers = {
+    decoder: decoderWidget, dfs: dfsWidget, bfs: bfsWidget,
+    braid: braidWidget, seed: seedWidget
+  };
+  Array.prototype.forEach.call(
+    document.querySelectorAll('[data-widget]'), function (box) {
+      var fn = makers[box.getAttribute('data-widget')];
+      if (fn) { fn(box); }
+    });
+})();
+
+</script>
+</body>
+</html>
