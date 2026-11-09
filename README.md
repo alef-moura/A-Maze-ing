@@ -1,4 +1,4 @@
-*This project has been created as part of the 42 curriculum by alesferr and ahideo-k.*
+*This project has been created as part of the 42 curriculum by alesferr and edgda-si.*
 
 # A-Maze-ing
 
@@ -190,16 +190,3 @@ draft the implementation plan; write a first version of the code, the unit
 tests, the Makefile and the packaging files; and write the study guide
 `docs/estudo.html`. Every generated part was reviewed, run, linted and
 tested by the team, and the team can explain it.
-
-## Team and project management
-
-<!-- TODO: fill in with the real information of your team. -->
-
-* **Roles**: <login1>: TODO. <login2>: TODO.
-* **Planning**: the plan was split into phases (skeleton and tooling,
-  configuration parser, generator, "42" pattern, braided mode, display and
-  menu, packaging, README, bonuses, study guide, defence rehearsal).
-  TODO: describe how it evolved.
-* **What worked well / could be improved**: TODO.
-* **Tools**: Python 3, flake8, mypy, pytest, `build`, Make, Git, Claude Code
-  (see "Use of AI"). TODO: add the others.
